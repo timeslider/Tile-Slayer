@@ -5,13 +5,15 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Numerics;
 using static Tile_Slayer.Util;
+using System.ComponentModel;
+using Tile_Slayer;
 
 namespace Tile_Slayer
 {
     internal class ValidPositionGenerator
     {
         private readonly Queue<ulong> bitBoards = new Queue<ulong>();
-        
+
         private readonly HashSet<ulong> visited = [];
 
         public HashSet<ulong> GetVisited()
@@ -26,25 +28,26 @@ namespace Tile_Slayer
                 throw new ArgumentOutOfRangeException($"maxTiles was {maxTiles}, but it should be between 0 and 63.");
             }
 
-            int i = 0;
+
             // These 10 boards are the only canonical 8x8 bitboards with 1 bit in them
-            //boards.Enqueue(0b0000000000000000000000000000000000000000000000000000000000000001);
-            //boards.Enqueue(0b0000000000000000000000000000000000000000000000000000000000000010);
-            //boards.Enqueue(0b0000000000000000000000000000000000000000000000000000000000000100);
-            //boards.Enqueue(0b0000000000000000000000000000000000000000000000000000000000001000);
-            //boards.Enqueue(0b0000000000000000000000000000000000000000000000000000001000000000);
-            //boards.Enqueue(0b0000000000000000000000000000000000000000000000000000010000000000);
-            //boards.Enqueue(0b0000000000000000000000000000000000000000000000000000100000000000);
-            //boards.Enqueue(0b0000000000000000000000000000000000000000000001000000000000000000);
-            //boards.Enqueue(0b0000000000000000000000000000000000000000000010000000000000000000);
-            //boards.Enqueue(0b0000000000000000000000000000000000001000000000000000000000000000);
+            bitBoards.Enqueue(0b0000000000000000000000000000000000000000000000000000000000000001);
+            bitBoards.Enqueue(0b0000000000000000000000000000000000000000000000000000000000000010);
+            bitBoards.Enqueue(0b0000000000000000000000000000000000000000000000000000000000000100);
+            bitBoards.Enqueue(0b0000000000000000000000000000000000000000000000000000000000001000);
+            bitBoards.Enqueue(0b0000000000000000000000000000000000000000000000000000001000000000);
+            bitBoards.Enqueue(0b0000000000000000000000000000000000000000000000000000010000000000);
+            bitBoards.Enqueue(0b0000000000000000000000000000000000000000000000000000100000000000);
+            bitBoards.Enqueue(0b0000000000000000000000000000000000000000000001000000000000000000);
+            bitBoards.Enqueue(0b0000000000000000000000000000000000000000000010000000000000000000);
+            bitBoards.Enqueue(0b0000000000000000000000000000000000001000000000000000000000000000);
 
             //// We could have done it automatically... but the above saves a few steps
-            while (i < 64)
-            {
-                bitBoards.Enqueue(CanonicalizeBitBoard((ulong)Math.Pow(2, i)));
-                i++;
-            }
+            //int i = 0;
+            //while (i < 64)
+            //{
+            //    bitBoards.Enqueue(CanonicalizeBitboard((ulong)Math.Pow(2, i)));
+            //    i++;
+            //}
 
             GenerateValid(bitBoards, maxTiles);
         }
@@ -69,13 +72,8 @@ namespace Tile_Slayer
                 visited.Add(board);
 
                 GetNewPositions(board, bitBoards, visited);
-                
+
                 i++;
-                if(i > 100_000)
-                {
-                    GC.Collect();
-                    i = 0;
-                }
             }
         }
 
@@ -87,7 +85,6 @@ namespace Tile_Slayer
 
             int i;
             ulong canonical;
-
             // Loop over each one and attempt to add each one to the output
             // Could probably optomize it a bit here
             // Like if we run into a cell with a bit in it, we can exit the while loop
@@ -95,7 +92,6 @@ namespace Tile_Slayer
             foreach (int index in indices)
             {
                 (int, int) pair = GetXYPairFromIndex(index);
-                // Up
                 i = 1;
                 while (pair.Item2 - i > -1)
                 {
@@ -104,7 +100,7 @@ namespace Tile_Slayer
                     {
                         break;
                     }
-                    canonical = CanonicalizeBitBoard(SetBitboardBit(board, pair.Item1, pair.Item2 - i, true));
+                    canonical = CanonicalizeBitboard(SetBitboardBit(board, pair.Item1, pair.Item2 - i, true));
                     if (!visited.Contains(canonical))
                     {
                         bitBoards.Enqueue(canonical);
@@ -120,7 +116,7 @@ namespace Tile_Slayer
                     {
                         break;
                     }
-                    canonical = CanonicalizeBitBoard(SetBitboardBit(board, pair.Item1 - i, pair.Item2, true));
+                    canonical = CanonicalizeBitboard(SetBitboardBit(board, pair.Item1 - i, pair.Item2, true));
                     if (!visited.Contains(canonical))
                     {
                         bitBoards.Enqueue(canonical);
@@ -136,7 +132,7 @@ namespace Tile_Slayer
                     {
                         break;
                     }
-                    canonical = CanonicalizeBitBoard(SetBitboardBit(board, pair.Item1 + i, pair.Item2, true));
+                    canonical = CanonicalizeBitboard(SetBitboardBit(board, pair.Item1 + i, pair.Item2, true));
                     if (!visited.Contains(canonical))
                     {
                         bitBoards.Enqueue(canonical);
@@ -152,7 +148,7 @@ namespace Tile_Slayer
                     {
                         break;
                     }
-                    canonical = CanonicalizeBitBoard(SetBitboardBit(board, pair.Item1, pair.Item2 + i, true));
+                    canonical = CanonicalizeBitboard(SetBitboardBit(board, pair.Item1, pair.Item2 + i, true));
                     if (!visited.Contains(canonical))
                     {
                         bitBoards.Enqueue(canonical);
@@ -161,10 +157,10 @@ namespace Tile_Slayer
                 }
             }
         }
+        
 
         private static List<int> GetIndices(ulong board)
         {
-            ulong temp = board;
             List<int> indices = new List<int>();
             int index = 0;
             while (board > 0)
@@ -184,5 +180,40 @@ namespace Tile_Slayer
         {
             return (index % 8, index / 8);
         }
+
+        // ########
+        // # Rows #
+        // ########
+        private readonly static ulong row_0 = 0b0000000000000000000000000000000000000000000000000000000011111111;
+        private readonly static ulong row_1 = 0b0000000000000000000000000000000000000000000000001111111100000000;
+        private readonly static ulong row_2 = 0b0000000000000000000000000000000000000000111111110000000000000000;
+        private readonly static ulong row_3 = 0b0000000000000000000000000000000011111111000000000000000000000000;
+        private readonly static ulong row_4 = 0b0000000000000000000000001111111100000000000000000000000000000000;
+        private readonly static ulong row_5 = 0b0000000000000000111111110000000000000000000000000000000000000000;
+        private readonly static ulong row_6 = 0b0000000011111111000000000000000000000000000000000000000000000000;
+        private readonly static ulong row_7 = 0b1111111100000000000000000000000000000000000000000000000000000000;
+
+        // ###########
+        // # Columns #
+        // ###########
+        private readonly static ulong col_0 = 0b0000000100000001000000010000000100000001000000010000000100000001;
+        private readonly static ulong col_1 = 0b0000001000000010000000100000001000000010000000100000001000000010;
+        private readonly static ulong col_2 = 0b0000010000000100000001000000010000000100000001000000010000000100;
+        private readonly static ulong col_3 = 0b0000100000001000000010000000100000001000000010000000100000001000;
+        private readonly static ulong col_4 = 0b0001000000010000000100000001000000010000000100000001000000010000;
+        private readonly static ulong col_5 = 0b0010000000100000001000000010000000100000001000000010000000100000;
+        private readonly static ulong col_6 = 0b0100000001000000010000000100000001000000010000000100000001000000;
+        private readonly static ulong col_7 = 0b1000000010000000100000001000000010000000100000001000000010000000;
+
+        private static readonly ulong[] rows = [row_0, row_1, row_2, row_3, row_4, row_5, row_6, row_7];
+        private static readonly ulong[] cols = [col_0, col_1, col_2, col_3, col_4, col_5, col_6, col_7];
+
     }
 }
+
+
+
+
+
+
+

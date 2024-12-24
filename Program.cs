@@ -21,11 +21,14 @@ namespace Tile_Slayer
             //ulong testBoard = 0b0000000010000000000000100000100001000000000100000000010000000000;
             //PrintBitboard(testBoard);
             //PrintBitboard(CanonicalizeBitBoard(testBoard));
-            //ValidPositionGenerator VPG = new ValidPositionGenerator(15);
+            //int maxTiles = 6;
+            //ValidPositionGenerator VPG = new ValidPositionGenerator(maxTiles);
+
+
 
             //foreach (ulong x in VPG.GetVisited())
             //{
-            //    if (BitOperations.PopCount(x) == 11)
+            //    if (BitOperations.PopCount(x) == maxTiles)
             //    {
             //        PrintBitboard(x);
             //    }
@@ -33,7 +36,13 @@ namespace Tile_Slayer
 
             //Console.WriteLine(VPG.GetVisited().Count);
 
-            
+            var generator = new ValidPositionGenerator2();
+            generator.Generate(4, 4);
+            //foreach (string position in generator.Positions)
+            //{
+            //    Console.WriteLine(position);
+            //}
+
 
 
             // The ouput should be

@@ -183,13 +183,14 @@ namespace Tile_Slayer
         private readonly static ulong col_6 = 0b0100000001000000010000000100000001000000010000000100000001000000;
         private readonly static ulong col_6_right = 0b1000000010000000100000001000000010000000100000001000000010000000;
 
-        private static readonly ulong[] rows =      { row_0, row_1, row_2, row_3, row_4, row_5, row_6 };
-        private static readonly ulong[] rowsBelow = { row_0_below, row_1_below, row_2_below, row_3_below, row_4_below, row_5_below, row_6_below };
+        private static readonly ulong[] rows =      [row_0, row_1, row_2, row_3, row_4, row_5, row_6];
+        private static readonly ulong[] rowsBelow = [row_0_below, row_1_below, row_2_below, row_3_below, row_4_below, row_5_below, row_6_below];
 
-        private static readonly ulong[] cols = { col_0, col_1, col_2, col_3, col_4, col_5, col_6 };
-        private static readonly ulong[] colsRight = { col_0_right, col_1_right, col_2_right, col_3_right, col_4_right, col_5_right, col_6_right };
+        private static readonly ulong[] cols = [col_0, col_1, col_2, col_3, col_4, col_5, col_6];
+        private static readonly ulong[] colsRight = [col_0_right, col_1_right, col_2_right, col_3_right, col_4_right, col_5_right, col_6_right];
 
-        // Deletes empty rows and columns and shifts the remaining up and to the left
+        // Deletes empty rows and columns and shifts the remaining up and left
+        // Note: This removes empty rows and columns BETWEEN the board too
         public static ulong ShiftAndRemoveEmpty(ulong bitBoard)
         {
             for (int i = 0; i < rows.Length; i++)
@@ -211,6 +212,24 @@ namespace Tile_Slayer
             return bitBoard;
         }
 
+        
+        // Deletes empty rows and columns and shifts the remaining up and to the left
+        // Note: This only shifts the bitboard to the top left corner
+        public static ulong ShiftUpAndRight(ulong bitBoard)
+        {
+            while ((bitBoard & rows[0]) == 0)
+            {
+                bitBoard = (bitBoard & rowsBelow[0]) >> 8;
+            }
+
+            while ((bitBoard & cols[0]) == 0)
+            {
+                bitBoard = (bitBoard & colsRight[0]) >> 1;
+            }
+
+            return bitBoard;
+        }
+
 
 
 
@@ -221,34 +240,37 @@ namespace Tile_Slayer
         /// <param name="bitBoard">The bitBoard to canonicalize</param>
         /// <param name="verboseLogging">If true, output inforamtion about the process to the console for debugging purposes</param>
         /// <returns>Returns the min hash from the puzzle</returns>
-        public static ulong CanonicalizeBitBoard(ulong bitBoard, bool verboseLogging = false)
+        public static ulong CanonicalizeBitboard(ulong bitBoard, bool verboseLogging = false)
         {
+            //// This is only temporary
+            //return bitBoard;
+            
             ulong original = bitBoard;
             HashSet<ulong> transformations =
             [
-                ShiftAndRemoveEmpty(bitBoard)
+                ShiftUpAndRight(bitBoard)
             ];
 
             bitBoard = Rotate90CCFast_8x8(bitBoard);
-            transformations.Add(ShiftAndRemoveEmpty(bitBoard));
+            transformations.Add(ShiftUpAndRight(bitBoard));
 
             bitBoard = Rotate90CCFast_8x8(bitBoard);
-            transformations.Add(ShiftAndRemoveEmpty(bitBoard));
+            transformations.Add(ShiftUpAndRight(bitBoard));
 
             bitBoard = Rotate90CCFast_8x8(bitBoard);
-            transformations.Add(ShiftAndRemoveEmpty(bitBoard));
+            transformations.Add(ShiftUpAndRight(bitBoard));
 
             bitBoard = FlipHorizontally(bitBoard);
-            transformations.Add(ShiftAndRemoveEmpty(bitBoard));
+            transformations.Add(ShiftUpAndRight(bitBoard));
 
             bitBoard = Rotate90CCFast_8x8(bitBoard);
-            transformations.Add(ShiftAndRemoveEmpty(bitBoard));
+            transformations.Add(ShiftUpAndRight(bitBoard));
 
             bitBoard = Rotate90CCFast_8x8(bitBoard);
-            transformations.Add(ShiftAndRemoveEmpty(bitBoard));
+            transformations.Add(ShiftUpAndRight(bitBoard));
 
             bitBoard = Rotate90CCFast_8x8(bitBoard);
-            transformations.Add(ShiftAndRemoveEmpty(bitBoard));
+            transformations.Add(ShiftUpAndRight(bitBoard));
 
             ulong minHash = ulong.MaxValue;
             foreach (ulong data in transformations)
@@ -281,7 +303,7 @@ namespace Tile_Slayer
         {
             Stopwatch sw = Stopwatch.StartNew();
             ulong i = 0UL;
-            while (i < 1_000_000_000)
+            while (i < 100000)
             {
                 action.Invoke();
                 i++;
