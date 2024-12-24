@@ -1,6 +1,9 @@
 ﻿
+using System.Diagnostics;
+using System.Numerics;
 using System.Runtime.CompilerServices;
 using System.Security.Cryptography.X509Certificates;
+using static Tile_Slayer.Util;
 
 [assembly: InternalsVisibleTo("UnitTests")]
 
@@ -12,15 +15,36 @@ namespace Tile_Slayer
         {
             //Puzzle puzzle = new Puzzle((14, 7), (14, 7));
 
-            //puzzle.PuzzleData.Add((3, 2), Puzzle.Tiles.Down);
+            //puzzle.PuzzleData.Add((3, 2), Puzzle.Tiles.Down);d
 
             //puzzle.PrintPuzzle();
+            //ulong testBoard = 0b0000000010000000000000100000100001000000000100000000010000000000;
+            //PrintBitboard(testBoard);
+            //PrintBitboard(CanonicalizeBitBoard(testBoard));
+            //ValidPositionGenerator VPG = new ValidPositionGenerator(15);
+
+            //foreach (ulong x in VPG.GetVisited())
+            //{
+            //    if (BitOperations.PopCount(x) == 11)
+            //    {
+            //        PrintBitboard(x);
+            //    }
+            //}
+
+            //Console.WriteLine(VPG.GetVisited().Count);
+
+            
+
+
+            // The ouput should be
+            // 526336
+            // 524296
+
+            //34078720
+            //17301504
             //Puzzle puzzle = new Puzzle();
-
-
-            ValidPositionGenerator VPG = new ValidPositionGenerator();
-
-
+            //puzzle.SetPuzzleData(34078720);
+            //puzzle.PrintUlong();
         }
 
 

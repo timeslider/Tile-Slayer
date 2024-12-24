@@ -50,8 +50,6 @@ namespace Tile_Slayer
     internal class Puzzle
     {
         #region Fields
-        private int _sizeX;
-        private int _sizeY;
         private HashSet<ulong> _puzzleDataMoves = new HashSet<ulong>();
 
         // Possible locations of where tiles might be
@@ -83,35 +81,7 @@ namespace Tile_Slayer
         #endregion
 
         #region Data Access Methods
-        public bool GetPuzzleCell(int row, int col)
-        {
 
-            int bitPosition = row * 8 + col;
-            return (PuzzleDataLocations & (1UL << bitPosition)) != 0;
-        }
-
-
-        public void SetPuzzleCell(int row, int col, bool value)
-        {
-            if (row < 0 || col < 0)
-            {
-                throw new ArgumentOutOfRangeException("The row or col was too small");
-            }
-            if (row > 7 || col > 7)
-            {
-                throw new ArgumentOutOfRangeException("The row or colo was too large");
-            }
-
-            int bitPosition = row * 8 + col;
-            if (value)
-            {
-                PuzzleDataLocations |= (1UL << bitPosition);
-            }
-            else
-            {
-                PuzzleDataLocations &= ~(1UL << bitPosition);
-            }
-        }
 
 
 
@@ -130,37 +100,7 @@ namespace Tile_Slayer
         #endregion
 
         #region Utility Methods
-        public void PrintUlong(bool invert = false)
-        {
-            StringBuilder sb = new StringBuilder();
-
-            // Prints the puzzle ID so we always know which puzzle we are displaying
-            sb.Append(PuzzleDataLocations.ToString() + "\n");
-
-            for (int row = 0; row < 8; row++)
-            {
-                for (int col = 0; col < 8; col++)
-                {
-                    if (invert == true)
-                    {
-
-                    }
-                    else
-                    {
-                        if (GetPuzzleCell(row, col) == true)
-                        {
-                            sb.Append("1 ");
-                        }
-                        else
-                        {
-                            sb.Append("0 ");
-                        }
-                    }
-                }
-                sb.Append('\n');
-            }
-            Console.WriteLine(sb.ToString());
-        }
+        
         public ulong Move(Direction direction)
         {
             Puzzle newPuzzle = new Puzzle();
