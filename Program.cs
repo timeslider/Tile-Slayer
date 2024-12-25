@@ -37,7 +37,8 @@ namespace Tile_Slayer
             //Console.WriteLine(VPG.GetVisited().Count);
 
             var generator = new ValidPositionGenerator2();
-            generator.Generate(4, 4);
+            generator.Generate(0, 0);
+            Console.WriteLine(generator.Positions.Count);
             //foreach (string position in generator.Positions)
             //{
             //    Console.WriteLine(position);
