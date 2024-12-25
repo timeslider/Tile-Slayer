@@ -6,14 +6,20 @@ using System.Threading.Tasks;
 
 namespace Tile_Slayer
 {
-    internal class ValidPositionGenerator2
+    internal class ValidPositionGeneratorV2
     {
-        const int N = 7;
+        private int N;
 
-        private readonly bool[,] _board = new bool[N, N];
+        private readonly bool[,] _board;
         private readonly StringBuilder _pattern = new();
 
         public HashSet<string> Positions { get; } = new();
+
+        public ValidPositionGeneratorV2(int n)
+        {
+            N = n;
+            _board = new bool[n, n];
+        }
 
         public void Generate(int x, int y)
         {

@@ -10,7 +10,7 @@ using Tile_Slayer;
 
 namespace Tile_Slayer
 {
-    internal class ValidPositionGenerator
+    internal class ValidPositionGeneratorV1
     {
         private readonly Queue<ulong> bitBoards = new Queue<ulong>();
 
@@ -21,7 +21,7 @@ namespace Tile_Slayer
             return visited;
         }
 
-        public ValidPositionGenerator(int maxTiles)
+        public ValidPositionGeneratorV1(int maxTiles)
         {
             if (maxTiles < 0 || maxTiles > 64)
             {
