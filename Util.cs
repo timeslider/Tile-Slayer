@@ -4,16 +4,19 @@ using System.Diagnostics;
 using System.Drawing;
 using System.Dynamic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Runtime.Intrinsics.X86;
 using System.Text;
 using System.Threading.Tasks;
+
+[assembly: InternalsVisibleTo("UtilTests")]
 
 namespace Tile_Slayer
 {
     internal static class Util
     {
         // Sets a new bit in a bitboard
-        public static ulong SetBitboardBit(ulong bitBoard, int x, int y, bool value)
+        public static ulong SetBitboardCell(ulong bitBoard, int x, int y, bool value)
         {
             if (x < 0 || y < 0)
             {
@@ -310,6 +313,98 @@ namespace Tile_Slayer
             }
             sw.Stop();
             Console.WriteLine(sw.Elapsed);
+        }
+
+        public static ulong ConvertPatternToBitboard(string pattern)
+        {
+            var bitboard = 0UL;
+            var position = (x: 0, y: 0);
+
+            // Set initial position
+            bitboard = SetBitboardCell(bitboard, position.x, position.y, true);
+
+            for (int i = 0; i < pattern.Length; i++)
+            {
+                position = GetNextPosition(position, pattern[i]);
+
+                // Set bit if it's the last character or different from next character
+                if (i == pattern.Length - 1 || pattern[i] != pattern[i + 1])
+                {
+                    bitboard = SetBitboardCell(bitboard, position.x, position.y, true);
+                }
+            }
+
+            return bitboard;
+        }
+
+        private static (int x, int y) GetNextPosition((int x, int y) current, char direction)
+        {
+            return direction switch
+            {
+                'R' => (current.x + 1, current.y),
+                'L' => (current.x - 1, current.y),
+                'U' => (current.x, current.y - 1),
+                'D' => (current.x, current.y + 1),
+                _ => current
+            };
+        }
+
+        public static void SavePuzzlesToBinaryFile(List<ulong> puzzles, string filePath)
+        {
+            if (filePath.EndsWith(".bin") == false)
+            {
+                filePath += ".bin";
+            }
+            using (FileStream fs = new FileStream(filePath, FileMode.Create, FileAccess.Write))
+            {
+                byte[] sbytes = new byte[8];
+                foreach (ulong puzzle in puzzles)
+                {
+                    sbytes = BitConverter.GetBytes(puzzle);
+                    fs.Write(sbytes, 0, sbytes.Length);
+                }
+            }
+        }
+
+
+        /// <summary>
+        /// If you don't include .bin, it'll add it automatically.
+        /// </summary>
+        /// <param name="puzzles"></param>
+        /// <param name="filePath"></param>
+        /// 
+        public static bool CompareCanonical(HashSet<ulong> setA, HashSet<ulong> setB)
+        {
+            foreach(ulong a in setA)
+            {
+                if(setB.Contains(a)) return true;
+            }
+            throw new NotImplementedException();
+        }
+
+        public static HashSet<ulong> ReduceToCanonical(HashSet<ulong> set)
+        {
+            HashSet<ulong> result = new HashSet<ulong>();
+
+            foreach(ulong a in set)
+            {
+                result.Add(CanonicalizeBitboard(a));
+            }
+
+            return result;
+        }
+
+        public static HashSet<ulong> ReduceToCanonical(HashSet<string> set, bool verboseLogging = false)
+        {
+            HashSet<ulong> result = new HashSet<ulong>();
+
+            foreach (string a in set)
+            {
+                result.Add(CanonicalizeBitboard(ConvertPatternToBitboard(a)));
+
+            }
+
+            return result;
         }
     }
 }

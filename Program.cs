@@ -1,65 +1,87 @@
-﻿
+﻿using System.ComponentModel;
 using System.Diagnostics;
 using System.Numerics;
+using System.Reflection.Emit;
 using System.Runtime.CompilerServices;
 using System.Security.Cryptography.X509Certificates;
 using static Tile_Slayer.Util;
 
 [assembly: InternalsVisibleTo("UnitTests")]
 
+// Filepath for saving output
+// C:\Users\rober\source\repos\Tile Slayer\PuzzleSolutions
+// Solution from a 6x6 RRDLDDDLDRRURURDRUUL
+
 namespace Tile_Slayer
 {
+    // I think v4 is working but I need to test and check
+    // Unlike the others, I think it's checking against canoncial versions first which should reduce memory
     public class Program
     {
         public static void Main(string[] args)
         {
-            //Puzzle puzzle = new Puzzle((14, 7), (14, 7));
 
-            //puzzle.PuzzleData.Add((3, 2), Puzzle.Tiles.Down);d
-
-            //puzzle.PrintPuzzle();
-            //ulong testBoard = 0b0000000010000000000000100000100001000000000100000000010000000000;
-            //PrintBitboard(testBoard);
-            //PrintBitboard(CanonicalizeBitBoard(testBoard));
-            //int maxTiles = 6;
-            //ValidPositionGenerator VPG = new ValidPositionGenerator(maxTiles);
+            DFS dfs = new DFS(8);
+            HashSet<ulong> parent = new HashSet<ulong>();
 
 
+            ulong startingBoard = 2385729457UL;
 
-            //foreach (ulong x in VPG.GetVisited())
-            //{
-            //    if (BitOperations.PopCount(x) == maxTiles)
-            //    {
-            //        PrintBitboard(x);
-            //    }
-            //}
-
-            //Console.WriteLine(VPG.GetVisited().Count);
-
-            var generator = new ValidPositionGeneratorV3(3);
-            generator.Generate(1, 1);
-
-            foreach (var position in generator.Positions)
+            for (int i = 0; i < 8; i++)
             {
-                Console.WriteLine(position);
+                for (int j = 0; j < 8; j++)
+                {
+                    parent.UnionWith(dfs.RookSearch(startingBoard, i, j));
+                }
             }
-            Console.WriteLine(generator.Positions.Count);
 
+            Console.WriteLine($"Total: {parent.Count}");
+            Console.WriteLine($"Canonical: {ReduceToCanonical(parent).Count}");
 
+            dfs = new DFS(8);
+            parent.Clear();
 
-            // The ouput should be
-            // 526336
-            // 524296
+            int total = 0;
+            int totalCanonical = 0;
+            for (int i = 0; i < 8; i++)
+            {
+                for (int j = 0; j < 8; j++)
+                {
+                    total += dfs.RookSearch(0UL, i, j).Count;
+                    parent.UnionWith(dfs.RookSearch(startingBoard, i, j));
+                }
+            }
 
-            //34078720
-            //17301504
-            //Puzzle puzzle = new Puzzle();
-            //puzzle.SetPuzzleData(34078720);
-            //puzzle.PrintUlong();
+            totalCanonical = ReduceToCanonical(parent).Count;
+
+            Console.WriteLine($"Total: {total}");
+            Console.WriteLine($"Canonical: {ReduceToCanonical(parent).Count}");
+
+            dfs = new DFS(8);
+            parent.Clear();
+
+            // These are the bare minimum starting nodes
+            var burnsidePositions = new (int x, int y)[]
+            {
+                (0, 0),
+                (0, 1),
+                (0, 2),
+                (0, 3),
+                (1, 1),
+                (1, 2),
+                (1, 3),
+                (2, 2),
+                (2, 3),
+                (3, 3),
+            };
+
+            foreach ((int x, int y) position in burnsidePositions)
+            {
+                parent.UnionWith(dfs.RookSearch(startingBoard, position.x, position.y));
+            }
+
+            Console.WriteLine($"Canonical: {ReduceToCanonical(parent).Count}");
         }
-
-
-
 
         #region Next lexigraphical bit
         //        int i = 15;

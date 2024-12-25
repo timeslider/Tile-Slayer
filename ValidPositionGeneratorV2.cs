@@ -6,6 +6,9 @@ using System.Threading.Tasks;
 
 namespace Tile_Slayer
 {
+    /// <summary>
+    /// 
+    /// </summary>
     internal class ValidPositionGeneratorV2
     {
         private int N;
