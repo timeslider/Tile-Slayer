@@ -2,8 +2,9 @@
 {
     private int N;
     private readonly bool[,] _board;
-    private int _patternLength = 0;  // Track actual number of directions
+    private int _patternLength = 0;
     private readonly List<byte> _pattern = new();
+    private ulong bitboard;
     public HashSet<DirectionSequence> Positions { get; } = new(new DirectionSequenceComparer());
 
     public ValidPositionGeneratorV3(int n)

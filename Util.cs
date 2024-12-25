@@ -4,16 +4,19 @@ using System.Diagnostics;
 using System.Drawing;
 using System.Dynamic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Runtime.Intrinsics.X86;
 using System.Text;
 using System.Threading.Tasks;
+
+[assembly: InternalsVisibleTo("UtilTests")]
 
 namespace Tile_Slayer
 {
     internal static class Util
     {
         // Sets a new bit in a bitboard
-        public static ulong SetBitboardBit(ulong bitBoard, int x, int y, bool value)
+        public static ulong SetBitboardCell(ulong bitBoard, int x, int y, bool value)
         {
             if (x < 0 || y < 0)
             {
@@ -215,23 +218,24 @@ namespace Tile_Slayer
         
         // Deletes empty rows and columns and shifts the remaining up and to the left
         // Note: This only shifts the bitboard to the top left corner
-        public static ulong ShiftUpAndRight(ulong bitBoard)
+        public static ulong ShiftUpAndLeft(ulong bitBoard)
         {
-            while ((bitBoard & rows[0]) == 0)
+            while((bitBoard & 0x1010101010101ff) == 0)
             {
-                bitBoard = (bitBoard & rowsBelow[0]) >> 8;
+                bitBoard = (bitBoard & 0xffffffffffffff00) >> 9;
+            }
+            while ((bitBoard & 0xff) == 0)
+            {
+                bitBoard = (bitBoard & 0xffffffffffffff00) >> 8;
             }
 
-            while ((bitBoard & cols[0]) == 0)
+            while ((bitBoard & 0x101010101010101) == 0)
             {
-                bitBoard = (bitBoard & colsRight[0]) >> 1;
+                bitBoard = (bitBoard & 0xfefefefefefefefe) >> 1;
             }
 
             return bitBoard;
         }
-
-
-
 
         /// <summary>
         /// Takes in a bitBoard and checks it against all 8 symmetries (4 rotations and their mirrors)<br></br>
@@ -248,29 +252,29 @@ namespace Tile_Slayer
             ulong original = bitBoard;
             HashSet<ulong> transformations =
             [
-                ShiftUpAndRight(bitBoard)
+                ShiftUpAndLeft(bitBoard)
             ];
 
             bitBoard = Rotate90CCFast_8x8(bitBoard);
-            transformations.Add(ShiftUpAndRight(bitBoard));
+            transformations.Add(ShiftUpAndLeft(bitBoard));
 
             bitBoard = Rotate90CCFast_8x8(bitBoard);
-            transformations.Add(ShiftUpAndRight(bitBoard));
+            transformations.Add(ShiftUpAndLeft(bitBoard));
 
             bitBoard = Rotate90CCFast_8x8(bitBoard);
-            transformations.Add(ShiftUpAndRight(bitBoard));
+            transformations.Add(ShiftUpAndLeft(bitBoard));
 
             bitBoard = FlipHorizontally(bitBoard);
-            transformations.Add(ShiftUpAndRight(bitBoard));
+            transformations.Add(ShiftUpAndLeft(bitBoard));
 
             bitBoard = Rotate90CCFast_8x8(bitBoard);
-            transformations.Add(ShiftUpAndRight(bitBoard));
+            transformations.Add(ShiftUpAndLeft(bitBoard));
 
             bitBoard = Rotate90CCFast_8x8(bitBoard);
-            transformations.Add(ShiftUpAndRight(bitBoard));
+            transformations.Add(ShiftUpAndLeft(bitBoard));
 
             bitBoard = Rotate90CCFast_8x8(bitBoard);
-            transformations.Add(ShiftUpAndRight(bitBoard));
+            transformations.Add(ShiftUpAndLeft(bitBoard));
 
             ulong minHash = ulong.MaxValue;
             foreach (ulong data in transformations)
@@ -299,17 +303,148 @@ namespace Tile_Slayer
             return minHash;
         }
 
-        public static void TimeAction(Action action)
+
+
+        public static ulong CanonicalizeBitboard2(ulong bitBoard, bool verboseLogging = false)
+        {
+            HashSet<ulong> transformations =
+            [
+                ShiftUpAndLeft(bitBoard)
+            ];
+
+            bitBoard = Rotate90CCFast_8x8(bitBoard);
+            transformations.Add(ShiftUpAndLeft(bitBoard));
+
+            bitBoard = Rotate90CCFast_8x8(bitBoard);
+            transformations.Add(ShiftUpAndLeft(bitBoard));
+
+            bitBoard = Rotate90CCFast_8x8(bitBoard);
+            transformations.Add(ShiftUpAndLeft(bitBoard));
+
+            bitBoard = FlipHorizontally(bitBoard);
+            transformations.Add(ShiftUpAndLeft(bitBoard));
+
+            bitBoard = Rotate90CCFast_8x8(bitBoard);
+            transformations.Add(ShiftUpAndLeft(bitBoard));
+
+            bitBoard = Rotate90CCFast_8x8(bitBoard);
+            transformations.Add(ShiftUpAndLeft(bitBoard));
+
+            bitBoard = Rotate90CCFast_8x8(bitBoard);
+            transformations.Add(ShiftUpAndLeft(bitBoard));
+
+            ulong minHash = ulong.MaxValue;
+            foreach (ulong data in transformations)
+            {
+                minHash = Math.Min(minHash, data);
+            }
+
+            return minHash;
+        }
+
+        public static void TimeAction(Action action, ulong iterations)
         {
             Stopwatch sw = Stopwatch.StartNew();
             ulong i = 0UL;
-            while (i < 100000)
+            while (i < iterations)
             {
                 action.Invoke();
                 i++;
             }
             sw.Stop();
             Console.WriteLine(sw.Elapsed);
+        }
+
+        public static ulong ConvertPatternToBitboard(string pattern)
+        {
+            var bitboard = 0UL;
+            var position = (x: 0, y: 0);
+
+            // Set initial position
+            bitboard = SetBitboardCell(bitboard, position.x, position.y, true);
+
+            for (int i = 0; i < pattern.Length; i++)
+            {
+                position = GetNextPosition(position, pattern[i]);
+
+                // Set bit if it's the last character or different from next character
+                if (i == pattern.Length - 1 || pattern[i] != pattern[i + 1])
+                {
+                    bitboard = SetBitboardCell(bitboard, position.x, position.y, true);
+                }
+            }
+
+            return bitboard;
+        }
+
+        private static (int x, int y) GetNextPosition((int x, int y) current, char direction)
+        {
+            return direction switch
+            {
+                'R' => (current.x + 1, current.y),
+                'L' => (current.x - 1, current.y),
+                'U' => (current.x, current.y - 1),
+                'D' => (current.x, current.y + 1),
+                _ => current
+            };
+        }
+
+        public static void SavePuzzlesToBinaryFile(List<ulong> puzzles, string filePath)
+        {
+            if (filePath.EndsWith(".bin") == false)
+            {
+                filePath += ".bin";
+            }
+            using (FileStream fs = new FileStream(filePath, FileMode.Create, FileAccess.Write))
+            {
+                byte[] sbytes = new byte[8];
+                foreach (ulong puzzle in puzzles)
+                {
+                    sbytes = BitConverter.GetBytes(puzzle);
+                    fs.Write(sbytes, 0, sbytes.Length);
+                }
+            }
+        }
+
+
+        /// <summary>
+        /// If you don't include .bin, it'll add it automatically.
+        /// </summary>
+        /// <param name="puzzles"></param>
+        /// <param name="filePath"></param>
+        /// 
+        public static bool CompareCanonical(HashSet<ulong> setA, HashSet<ulong> setB)
+        {
+            foreach(ulong a in setA)
+            {
+                if(setB.Contains(a)) return true;
+            }
+            throw new NotImplementedException();
+        }
+
+        public static HashSet<ulong> ReduceToCanonical(HashSet<ulong> set)
+        {
+            HashSet<ulong> result = new HashSet<ulong>();
+
+            foreach(ulong a in set)
+            {
+                result.Add(CanonicalizeBitboard(a));
+            }
+
+            return result;
+        }
+
+        public static HashSet<ulong> ReduceToCanonical(HashSet<string> set, bool verboseLogging = false)
+        {
+            HashSet<ulong> result = new HashSet<ulong>();
+
+            foreach (string a in set)
+            {
+                result.Add(CanonicalizeBitboard(ConvertPatternToBitboard(a)));
+
+            }
+
+            return result;
         }
     }
 }

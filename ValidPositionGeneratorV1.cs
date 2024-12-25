@@ -10,6 +10,9 @@ using Tile_Slayer;
 
 namespace Tile_Slayer
 {
+    /// <summary>
+    /// This was my attempt
+    /// </summary>
     internal class ValidPositionGeneratorV1
     {
         private readonly Queue<ulong> bitBoards = new Queue<ulong>();
@@ -100,7 +103,7 @@ namespace Tile_Slayer
                     {
                         break;
                     }
-                    canonical = CanonicalizeBitboard(SetBitboardBit(board, pair.Item1, pair.Item2 - i, true));
+                    canonical = CanonicalizeBitboard(SetBitboardCell(board, pair.Item1, pair.Item2 - i, true));
                     if (!visited.Contains(canonical))
                     {
                         bitBoards.Enqueue(canonical);
@@ -116,7 +119,7 @@ namespace Tile_Slayer
                     {
                         break;
                     }
-                    canonical = CanonicalizeBitboard(SetBitboardBit(board, pair.Item1 - i, pair.Item2, true));
+                    canonical = CanonicalizeBitboard(SetBitboardCell(board, pair.Item1 - i, pair.Item2, true));
                     if (!visited.Contains(canonical))
                     {
                         bitBoards.Enqueue(canonical);
@@ -132,7 +135,7 @@ namespace Tile_Slayer
                     {
                         break;
                     }
-                    canonical = CanonicalizeBitboard(SetBitboardBit(board, pair.Item1 + i, pair.Item2, true));
+                    canonical = CanonicalizeBitboard(SetBitboardCell(board, pair.Item1 + i, pair.Item2, true));
                     if (!visited.Contains(canonical))
                     {
                         bitBoards.Enqueue(canonical);
@@ -148,7 +151,7 @@ namespace Tile_Slayer
                     {
                         break;
                     }
-                    canonical = CanonicalizeBitboard(SetBitboardBit(board, pair.Item1, pair.Item2 + i, true));
+                    canonical = CanonicalizeBitboard(SetBitboardCell(board, pair.Item1, pair.Item2 + i, true));
                     if (!visited.Contains(canonical))
                     {
                         bitBoards.Enqueue(canonical);
