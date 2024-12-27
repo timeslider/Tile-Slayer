@@ -1,10 +1,11 @@
-﻿using System.ComponentModel;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Numerics;
 using System.Reflection.Emit;
 using System.Runtime.CompilerServices;
 using System.Security.Cryptography.X509Certificates;
 using static Tile_Slayer.Util;
+using System.Runtime.Intrinsics.X86;
 
 [assembly: InternalsVisibleTo("UnitTests")]
 
@@ -20,86 +21,59 @@ namespace Tile_Slayer
     {
         public static void Main(string[] args)
         {
+            //for (ulong i = 0; i < 100; i++)
+            //{
+            //    Console.WriteLine(BitOperations.PopCount(i));
+            //}
+            int n = 5;
+            DFS dfs = new DFS(n);
 
-            //DFS dfs = new DFS(8);
-            //HashSet<ulong> parent = new HashSet<ulong>();
+            HashSet<ulong> parent = new HashSet<ulong>();
+            HashSet<ulong> grandparent = new HashSet<ulong>();
 
-            //Console.WriteLine(ReduceToCanonical(dfs.RookSearch(0UL, 0, 0)).Count);
+            for (int i = 0; i < n; i++)
+            {
+                for (int j = 0; j < n; j++)
+                {
+                    parent.UnionWith(dfs.RookSearch(0UL, i, j));
 
+                }
+            }
 
             //ulong startingBoard = 2385729457UL;
 
-            //for (int i = 0; i < 8; i++)
+            // Print all the children in parents
+            //foreach(var child in parent)
             //{
-            //    for (int j = 0; j < 8; j++)
-            //    {
-            //        parent.UnionWith(dfs.RookSearch(startingBoard, i, j));
-            //    }
+            //    PrintBitboard(child);
+            //    Thread.Sleep(50);
             //}
 
-            //Console.WriteLine($"Total: {parent.Count}");
-            //Console.WriteLine($"Canonical: {ReduceToCanonical(parent).Count}");
+            //grandparent.UnionWith(parent);
+            for (int i = 0; i < n; i++)
+            {
+                foreach (ulong child in parent)
+                {
+                    grandparent.Add(child);
+                    var xy_pairs = GetValues(child);
 
-            //dfs = new DFS(8);
-            //parent.Clear();
+                    foreach (var pair in xy_pairs)
+                    {
+                        grandparent.UnionWith(ReduceToCanonical(dfs.RookSearch(child, pair.x, pair.y)));
+                    }
+                }
+                parent.UnionWith(ReduceToCanonical(grandparent));
 
-            //int total = 0;
-            //int totalCanonical = 0;
-            //for (int i = 0; i < 8; i++)
-            //{
-            //    for (int j = 0; j < 8; j++)
-            //    {
-            //        total += dfs.RookSearch(0UL, i, j).Count;
-            //        parent.UnionWith(dfs.RookSearch(startingBoard, i, j));
-            //    }
-            //}
+            }
 
             //totalCanonical = ReduceToCanonical(parent).Count;
 
             //Console.WriteLine($"Total: {total}");
             //Console.WriteLine($"Canonical: {ReduceToCanonical(parent).Count}");
 
-            //dfs = new DFS(8);
-            //parent.Clear();
-
-            //// These are the bare minimum starting nodes
-            //var burnsidePositions = new (int x, int y)[]
-            //{
-            //    (0, 0),
-            //    (0, 1),
-            //    (0, 2),
-            //    (0, 3),
-            //    (1, 1),
-            //    (1, 2),
-            //    (1, 3),
-            //    (2, 2),
-            //    (2, 3),
-            //    (3, 3),
-            //};
-
-            //foreach ((int x, int y) position in burnsidePositions)
-            //{
-            //    parent.UnionWith(dfs.RookSearch(startingBoard, position.x, position.y));
-            //}
-
-            //Console.WriteLine($"Canonical: {ReduceToCanonical(parent).Count}");
-            Action action = () => {
-                Util.ShiftUpAndLeft(0x8000000000000000);
-            };
-
-            TimeAction(action, 1_000_000_000);
-
-
-            Action action2 = () =>
-            {
-                Util.ShiftUpAndLeft2(0x8000000000000000);
-            };
-
-            TimeAction(action2, 1_000_000_000);
-
-
-
-
+            grandparent = ReduceToCanonical(grandparent);
+            Console.WriteLine(grandparent.Max<ulong>());
+            Console.WriteLine(grandparent.Count);
         }
 
         #region Next lexigraphical bit
