@@ -70,5 +70,49 @@ namespace Tile_Slayer
             }
             return found;
         }
+
+        public HashSet<ulong> RookSearchGrid(ulong inital, int startX, int startY)
+        {
+            Stack<ulong> possible = new Stack<ulong>();
+            HashSet<ulong> marked = new HashSet<ulong>();
+
+            ulong start = SetBitboardCell(inital, startX, startY, true);
+            possible.Push(start);
+            marked.Add(start);
+
+            // Generate directions for the specific row and column
+            var directions = new List<(int dx, int dy)>();
+            // Add horizontal moves in startY row
+            for (int d = 1; d <= 7; d++)
+            {
+                if (startX + d < N) directions.Add((d, 0));   // right
+                if (startX - d >= 0) directions.Add((-d, 0)); // left
+            }
+            // Add vertical moves in startX column
+            for (int d = 1; d <= 7; d++)
+            {
+                if (startY + d < N) directions.Add((0, d));   // down
+                if (startY - d >= 0) directions.Add((0, -d)); // up
+            }
+
+            while (possible.Count > 0)
+            {
+                ulong vertex = possible.Pop();
+
+                foreach (var (dx, dy) in directions)
+                {
+                    int newX = startX + dx;
+                    int newY = startY + dy;
+
+                    ulong nextVertex = SetBitboardCell(vertex, newX, newY, true);
+                    if (!marked.Contains(nextVertex))
+                    {
+                        possible.Push(nextVertex);
+                        marked.Add(nextVertex);
+                    }
+                }
+            }
+            return marked;
+        }
     }
 }

@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Drawing;
 using System.Dynamic;
 using System.Linq;
+using System.Numerics;
 using System.Runtime.CompilerServices;
 using System.Runtime.Intrinsics.X86;
 using System.Text;
@@ -406,5 +407,29 @@ namespace Tile_Slayer
 
             return result;
         }
+
+        /// <summary>
+        /// Finds the x, y pairs of all the bits in a ulong
+        /// </summary>
+        /// <param name="ul"></param>
+        /// <returns></returns>
+        public static List<(int x, int y)> GetValues(ulong ul)
+        {
+
+            int index;
+            int accumativeIndex = 0;
+            List<(int x, int y)> result = new List<(int x, int y)>();
+
+            while(ul > 0)
+            {
+                index = BitOperations.TrailingZeroCount(ul);
+                accumativeIndex += index;
+                result.Add((accumativeIndex % 8, accumativeIndex / 8));
+                ul >>= index + 1;
+                accumativeIndex++;
+            }
+            return result;
+        }
+
     }
 }
