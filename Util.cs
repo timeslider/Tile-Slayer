@@ -471,5 +471,12 @@ namespace Tile_Slayer
             return result;
         }
 
+        public static ulong GetNext(ulong bitboard, ulong mask)
+        {
+            Bmi2.
+            ulong t = bitboard | (bitboard - 1);
+            return (t + 1) | ((~(long)t & -~(long)t) - 1) >> (BSF(bitboard) + 1);
+        }
+
     }
 }
