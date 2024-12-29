@@ -16,6 +16,10 @@ namespace Tile_Slayer
 {
     internal static class Util
     {
+        static Util()
+        {
+
+        }
         // Sets a new bit in a bitboard
         public static ulong SetBitboardCell(ulong bitBoard, int x, int y, bool value)
         {
@@ -62,7 +66,7 @@ namespace Tile_Slayer
                     {
                         if (GetBitboardCell(bitBoard, row, col) == true)
                         {
-                            sb.Append("0 ");
+                            sb.Append("- ");
                         }
                         else
                         {
@@ -77,7 +81,7 @@ namespace Tile_Slayer
                         }
                         else
                         {
-                            sb.Append("0 ");
+                            sb.Append("- ");
                         }
                     }
                 }
@@ -118,6 +122,7 @@ namespace Tile_Slayer
 
 
 
+
         public static ulong FlipHorizontally(ulong bitBoard)
         {
             bitBoard = (bitBoard << 56) |
@@ -132,71 +137,396 @@ namespace Tile_Slayer
             return bitBoard;
         }
 
-        // ########
-        // # Rows #
-        // ########
-        private readonly static ulong row_0 =       0b0000000000000000000000000000000000000000000000000000000011111111;
-        private readonly static ulong row_0_below = 0b1111111111111111111111111111111111111111111111111111111100000000;
-
-
-        private readonly static ulong row_1 =       0b0000000000000000000000000000000000000000000000001111111100000000;
-        private readonly static ulong row_1_below = 0b1111111111111111111111111111111111111111111111110000000000000000;
-
-
-        private readonly static ulong row_2 =       0b0000000000000000000000000000000000000000111111110000000000000000;
-        private readonly static ulong row_2_below = 0b1111111111111111111111111111111111111111000000000000000000000000;
 
 
 
-        private readonly static ulong row_3 =       0b0000000000000000000000000000000011111111000000000000000000000000;
-        private readonly static ulong row_3_below = 0b1111111111111111111111111111111100000000000000000000000000000000;
+        // ################
+        // # Rows for 1x1 #
+        // ################
+        private readonly static ulong row_0_1x1 = 0x1;
 
 
-        private readonly static ulong row_4 =       0b0000000000000000000000001111111100000000000000000000000000000000;
-        private readonly static ulong row_4_below = 0b1111111111111111111111110000000000000000000000000000000000000000;
+        // ###################
+        // # Columns for 1x1 #
+        // ###################
+        private readonly static ulong col_0_1x1 = 0x1;
+
+        public static readonly ulong[] rows_1x1 = [row_0_1x1];
+        public static readonly ulong[] rowsBelow_1x1 = [];
+
+        public static readonly ulong[] cols_1x1 = [col_0_1x1];
+        public static readonly ulong[] colsRight_1x1 = [];
 
 
-        private readonly static ulong row_5 =       0b0000000000000000111111110000000000000000000000000000000000000000;
-        private readonly static ulong row_5_below = 0b1111111111111111000000000000000000000000000000000000000000000000;
-
-        private readonly static ulong row_6 =       0b0000000011111111000000000000000000000000000000000000000000000000;
-        private readonly static ulong row_6_below = 0b1111111100000000000000000000000000000000000000000000000000000000;
 
 
-        // ###########
-        // # Columns #
-        // ###########
-        private readonly static ulong col_0 = 0b0000000100000001000000010000000100000001000000010000000100000001;
-        private readonly static ulong col_0_right = 0b1111111011111110111111101111111011111110111111101111111011111110;
+        // ################
+        // # Rows for 2x2 #
+        // ################
+        private readonly static ulong row_0_2x2 = 0x3;
+        private readonly static ulong row_0_below_2x2 = 0x300;
 
-        private readonly static ulong col_1 = 0b0000001000000010000000100000001000000010000000100000001000000010;
-        private readonly static ulong col_1_right = 0b1111110011111100111111001111110011111100111111001111110011111100;
+        private readonly static ulong row_1_2x2 = 0x300;
 
-        private readonly static ulong col_2 = 0b0000010000000100000001000000010000000100000001000000010000000100;
-        private readonly static ulong col_2_right = 0b1111100011111000111110001111100011111000111110001111100011111000;
 
-        private readonly static ulong col_3 = 0b0000100000001000000010000000100000001000000010000000100000001000;
-        private readonly static ulong col_3_right = 0b1111000011110000111100001111000011110000111100001111000011110000;
+        // ###################
+        // # Columns for 2x2 #
+        // ###################
+        private readonly static ulong col_0_2x2 = 0x101;
+        private readonly static ulong col_0_right_2x2 = 0x202;
 
-        private readonly static ulong col_4 = 0b0001000000010000000100000001000000010000000100000001000000010000;
-        private readonly static ulong col_4_right = 0b1110000011100000111000001110000011100000111000001110000011100000;
+        private readonly static ulong col_1_2x2 = 0x202;
 
-        private readonly static ulong col_5 = 0b0010000000100000001000000010000000100000001000000010000000100000;
-        private readonly static ulong col_5_right = 0b1100000011000000110000001100000011000000110000001100000011000000;
+        public static readonly ulong[] rows_2x2 = [row_0_2x2, row_1_2x2];
+        public static readonly ulong[] rowsBelow_2x2 = [row_0_below_2x2];
 
-        private readonly static ulong col_6 = 0b0100000001000000010000000100000001000000010000000100000001000000;
-        private readonly static ulong col_6_right = 0b1000000010000000100000001000000010000000100000001000000010000000;
+        public static readonly ulong[] cols_2x2 = [col_0_2x2, col_1_2x2];
+        public static readonly ulong[] colsRight_2x2 = [col_0_right_2x2];
 
-        private static readonly ulong[] rows =      [row_0, row_1, row_2, row_3, row_4, row_5, row_6];
-        private static readonly ulong[] rowsBelow = [row_0_below, row_1_below, row_2_below, row_3_below, row_4_below, row_5_below, row_6_below];
 
-        private static readonly ulong[] cols = [col_0, col_1, col_2, col_3, col_4, col_5, col_6];
-        private static readonly ulong[] colsRight = [col_0_right, col_1_right, col_2_right, col_3_right, col_4_right, col_5_right, col_6_right];
+
+
+        // ################
+        // # Rows for 3x3 #
+        // ################
+        private readonly static ulong row_0_3x3 = 0x7;
+        private readonly static ulong row_0_below_3x3 = 0x70700;
+
+        private readonly static ulong row_1_3x3 = 0x700;
+        private readonly static ulong row_1_below_3x3 = 0x70000;
+
+        private readonly static ulong row_2_3x3 = 0x70000;
+
+
+
+        // ###################
+        // # Columns for 3x3 #
+        // ###################
+        private readonly static ulong col_0_3x3 = 0x10101;
+        private readonly static ulong col_0_right_3x3 = 0x60606;
+
+        private readonly static ulong col_1_3x3 = 0x20202;
+        private readonly static ulong col_1_right_3x3 = 0x40404;
+
+        private readonly static ulong col_2_3x3 = 0x40404;
+
+
+        public static readonly ulong[] rows_3x3 = [row_0_3x3, row_1_3x3, row_2_3x3];
+        public static readonly ulong[] rowsBelow_3x3 = [row_0_below_3x3, row_1_below_3x3];
+
+        public static readonly ulong[] cols_3x3 = [col_0_3x3, col_1_3x3, col_2_3x3];
+        public static readonly ulong[] colsRight_3x3 = [col_0_right_3x3, col_1_right_3x3];
+
+
+
+
+        // ################
+        // # Rows for 4x4 #
+        // ################
+        private readonly static ulong row_0_4x4 = 0xf;
+        private readonly static ulong row_0_below_4x4 = 0xf0f0f00;
+
+        private readonly static ulong row_1_4x4 = 0xf00;
+        private readonly static ulong row_1_below_4x4 = 0xf0f0000;
+
+        private readonly static ulong row_2_4x4 = 0xf0000;
+        private readonly static ulong row_2_below_4x4 = 0xf000000;
+
+        private readonly static ulong row_3_4x4 = 0xf000000;
+
+
+        // ###################
+        // # Columns for 4x4 #
+        // ###################
+        private readonly static ulong col_0_4x4 = 0x1010101;
+        private readonly static ulong col_0_right_4x4 = 0xe0e0e0e;
+
+        private readonly static ulong col_1_4x4 = 0x2020202;
+        private readonly static ulong col_1_right_4x4 = 0xc0c0c0c;
+
+        private readonly static ulong col_2_4x4 = 0x4040404;
+        private readonly static ulong col_2_right_4x4 = 0x8080808;
+
+        private readonly static ulong col_3_4x4 = 0x8080808;
+
+        public static readonly ulong[] rows_4x4 = [row_0_4x4, row_1_4x4, row_2_4x4, row_3_4x4];
+        public static readonly ulong[] rowsBelow_4x4 = [row_0_below_4x4, row_1_below_4x4, row_2_below_4x4];
+
+        public static readonly ulong[] cols_4x4 = [col_0_4x4, col_1_4x4, col_2_4x4, col_3_4x4];
+        public static readonly ulong[] colsRight_4x4 = [col_0_right_4x4, col_1_right_4x4, col_2_right_4x4];
+
+
+
+
+        // ################
+        // # Rows for 5x5 #
+        // ################
+        private readonly static ulong row_0_5x5 = 0x1f;
+        private readonly static ulong row_0_below_5x5 = 0x1f1f1f1f00;
+
+        private readonly static ulong row_1_5x5 = 0x1f00;
+        private readonly static ulong row_1_below_5x5 = 0x1f1f1f0000;
+
+        private readonly static ulong row_2_5x5 = 0x1f0000;
+        private readonly static ulong row_2_below_5x5 = 0x1f1f000000;
+
+        private readonly static ulong row_3_5x5 = 0x1f000000;
+        private readonly static ulong row_3_below_5x5 = 0x1f00000000;
+
+        private readonly static ulong row_4_5x5 = 0x1f00000000;
+
+
+        // ###################
+        // # Columns for 5x5 #
+        // ###################
+        private readonly static ulong col_0_5x5 = 0x101010101;
+        private readonly static ulong col_0_right_5x5 = 0x1e1e1e1e1e;
+
+        private readonly static ulong col_1_5x5 = 0x202020202;
+        private readonly static ulong col_1_right_5x5 = 0x1c1c1c1c1c;
+
+        private readonly static ulong col_2_5x5 = 0x404040404;
+        private readonly static ulong col_2_right_5x5 = 0x1818181818;
+
+        private readonly static ulong col_3_5x5 = 0x808080808;
+        private readonly static ulong col_3_right_5x5 = 0x1010101010;
+
+        private readonly static ulong col_4_5x5 = 0x1010101010;
+
+        public static readonly ulong[] rows_5x5 = [row_0_5x5, row_1_5x5, row_2_5x5, row_3_5x5, row_4_5x5];
+        public static readonly ulong[] rowsBelow_5x5 = [row_0_below_5x5, row_1_below_5x5, row_2_below_5x5, row_3_below_5x5];
+
+        public static readonly ulong[] cols_5x5 = [col_0_5x5, col_1_5x5, col_2_5x5, col_3_5x5, col_4_5x5];
+        public static readonly ulong[] colsRight_5x5 = [col_0_right_5x5, col_1_right_5x5, col_2_right_5x5, col_3_right_5x5];
+
+
+
+
+        // ################
+        // # Rows for 6x6 #
+        // ################
+        private readonly static ulong row_0_6x6 = 0x3f;
+        private readonly static ulong row_0_below_6x6 = 0x3f3f3f3f3f00;
+
+        private readonly static ulong row_1_6x6 = 0x3f00;
+        private readonly static ulong row_1_below_6x6 = 0x3f3f3f3f0000;
+
+        private readonly static ulong row_2_6x6 = 0x3f0000;
+        private readonly static ulong row_2_below_6x6 = 0x3f3f3f000000;
+
+        private readonly static ulong row_3_6x6 = 0x3f000000;
+        private readonly static ulong row_3_below_6x6 = 0x3f3f00000000;
+
+        private readonly static ulong row_4_6x6 = 0x3f00000000;
+        private readonly static ulong row_4_below_6x6 = 0x3f0000000000;
+
+        private readonly static ulong row_5_6x6 = 0x3f0000000000;
+
+
+
+        // ###################
+        // # Columns for 6x6 #
+        // ###################
+        private readonly static ulong col_0_6x6 = 0x10101010101;
+        private readonly static ulong col_0_right_6x6 = 0x3e3e3e3e3e3e;
+
+        private readonly static ulong col_1_6x6 = 0x20202020202;
+        private readonly static ulong col_1_right_6x6 = 0x3c3c3c3c3c3c;
+
+        private readonly static ulong col_2_6x6 = 0x40404040404;
+        private readonly static ulong col_2_right_6x6 = 0x383838383838;
+
+        private readonly static ulong col_3_6x6 = 0x80808080808;
+        private readonly static ulong col_3_right_6x6 = 0x303030303030;
+
+        private readonly static ulong col_4_6x6 = 0x101010101010;
+        private readonly static ulong col_4_right_6x6 = 0x202020202020;
+
+        private readonly static ulong col_5_6x6 = 0x202020202020;
+
+        public static readonly ulong[] rows_6x6 = [row_0_6x6, row_1_6x6, row_2_6x6, row_3_6x6, row_4_6x6, row_5_6x6];
+        public static readonly ulong[] rowsBelow_6x6 = [row_0_below_6x6, row_1_below_6x6, row_2_below_6x6, row_3_below_6x6, row_4_below_6x6];
+
+        public static readonly ulong[] cols_6x6 = [col_0_6x6, col_1_6x6, col_2_6x6, col_3_6x6, col_4_6x6, col_5_6x6];
+        public static readonly ulong[] colsRight_6x6 = [col_0_right_6x6, col_1_right_6x6, col_2_right_6x6, col_3_right_6x6, col_4_right_6x6];
+
+
+
+
+
+        // ################
+        // # Rows for 7x7 #
+        // ################
+        private readonly static ulong[] rows_7x7_ = [
+            0x7f,
+            0x7f00,
+            0x7f0000,
+            0x7f000000,
+            0x7f00000000,
+            0x7f0000000000,
+            ];
+
+        private readonly static ulong row_0_7x7 = 0x7f;
+        private readonly static ulong row_0_below_7x7 = 0x7f7f7f7f7f7f00;
+
+        private readonly static ulong row_1_7x7 = 0x7f00;
+        private readonly static ulong row_1_below_7x7 = 0x7f7f7f7f7f0000;
+
+        private readonly static ulong row_2_7x7 = 0x7f0000;
+        private readonly static ulong row_2_below_7x7 = 0x7f7f7f7f000000;
+
+        private readonly static ulong row_3_7x7 = 0x7f000000;
+        private readonly static ulong row_3_below_7x7 = 0x7f7f7f00000000;
+
+        private readonly static ulong row_4_7x7 = 0x7f00000000;
+        private readonly static ulong row_4_below_7x7 = 0x7f7f0000000000;
+
+        private readonly static ulong row_5_7x7 = 0x7f0000000000;
+        private readonly static ulong row_5_below_7x7 = 0x7f000000000000;
+
+        private readonly static ulong row_6_7x7 = 0x7f000000000000;
+
+
+        // ###################
+        // # Columns for 7x7 #
+        // ###################
+        private readonly static ulong col_0_7x7 = 0x1010101010101;
+        private readonly static ulong col_0_right_7x7 = 0x7e7e7e7e7e7e7e;
+
+        private readonly static ulong col_1_7x7 = 0x2020202020202;
+        private readonly static ulong col_1_right_7x7 = 0x7c7c7c7c7c7c7c;
+
+        private readonly static ulong col_2_7x7 = 0x4040404040404;
+        private readonly static ulong col_2_right_7x7 = 0x78787878787878;
+
+        private readonly static ulong col_3_7x7 = 0x8080808080808;
+        private readonly static ulong col_3_right_7x7 = 0x70707070707070;
+
+        private readonly static ulong col_4_7x7 = 0x10101010101010;
+        private readonly static ulong col_4_right_7x7 = 0x60606060606060;
+
+        private readonly static ulong col_5_7x7 = 0x20202020202020;
+        private readonly static ulong col_5_right_7x7 = 0x40404040404040;
+
+        private readonly static ulong col_6_7x7 = 0x40404040404040;
+
+        public static readonly ulong[] rows_7x7 = [row_0_7x7, row_1_7x7, row_2_7x7, row_3_7x7, row_4_7x7, row_5_7x7, row_6_7x7];
+        public static readonly ulong[] rowsBelow_7x7 = [row_0_below_7x7, row_1_below_7x7, row_2_below_7x7, row_3_below_7x7, row_4_below_7x7, row_5_below_7x7];
+
+        public static readonly ulong[] cols_7x7 = [col_0_7x7, col_1_7x7, col_2_7x7, col_3_7x7, col_4_7x7, col_5_7x7, col_6_7x7];
+        public static readonly ulong[] colsRight_7x7 = [col_0_right_7x7, col_1_right_7x7, col_2_right_7x7, col_3_right_7x7, col_4_right_7x7, col_5_right_7x7];
+
+
+
+
+        // ################
+        // # Rows for 8x8 #
+        // ################
+        private readonly static ulong row_0_8x8 = 0xff;
+        private readonly static ulong row_0_below_8x8 = 0xffffffffffffff00;
+
+        private readonly static ulong row_1_8x8 = 0xff00;
+        private readonly static ulong row_1_below_8x8 = 0xffffffffffff0000;
+
+        private readonly static ulong row_2_8x8 = 0xff0000;
+        private readonly static ulong row_2_below_8x8 = 0xffffffffff000000;
+
+        private readonly static ulong row_3_8x8 = 0xff000000;
+        private readonly static ulong row_3_below_8x8 = 0xffffffff00000000;
+
+        private readonly static ulong row_4_8x8 = 0xff00000000;
+        private readonly static ulong row_4_below_8x8 = 0xffffff0000000000;
+
+        private readonly static ulong row_5_8x8 = 0xff0000000000;
+        private readonly static ulong row_5_below_8x8 = 0xffff000000000000;
+
+        private readonly static ulong row_6_8x8 = 0xff000000000000;
+        private readonly static ulong row_6_below_8x8 = 0xff00000000000000;
+
+        private readonly static ulong row_7_8x8 = 0xff00000000000000;
+
+        // ###################
+        // # Columns for 8x8 #
+        // ###################
+        private readonly static ulong col_0_8x8 = 0x101010101010101;
+        private readonly static ulong col_0_right_8x8 = 0xfefefefefefefefe;
+
+        private readonly static ulong col_1_8x8 = 0x202020202020202;
+        private readonly static ulong col_1_right_8x8 = 0xfcfcfcfcfcfcfcfc;
+
+        private readonly static ulong col_2_8x8 = 0x404040404040404;
+        private readonly static ulong col_2_right_8x8 = 0xf8f8f8f8f8f8f8f8;
+
+        private readonly static ulong col_3_8x8 = 0x808080808080808;
+        private readonly static ulong col_3_right_8x8 = 0xf0f0f0f0f0f0f0f0;
+
+        private readonly static ulong col_4_8x8 = 0x1010101010101010;
+        private readonly static ulong col_4_right_8x8 = 0xe0e0e0e0e0e0e0e0;
+
+        private readonly static ulong col_5_8x8 = 0x2020202020202020;
+        private readonly static ulong col_5_right_8x8 = 0xc0c0c0c0c0c0c0c0;
+
+        private readonly static ulong col_6_8x8 = 0x4040404040404040;
+        private readonly static ulong col_6_right_8x8 = 0x8080808080808080;
+
+        private readonly static ulong col_7_8x8 = 0x8080808080808080;
+
+        public static readonly ulong[] rows_8x8 = [row_0_8x8, row_1_8x8, row_2_8x8, row_3_8x8, row_4_8x8, row_5_8x8, row_6_8x8, row_7_8x8];
+        public static readonly ulong[] rowsBelow_8x8 = [row_0_below_8x8, row_1_below_8x8, row_2_below_8x8, row_3_below_8x8, row_4_below_8x8, row_5_below_8x8, row_6_below_8x8];
+
+        public static readonly ulong[] cols_8x8 = [col_0_8x8, col_1_8x8, col_2_8x8, col_3_8x8, col_4_8x8, col_5_8x8, col_6_8x8, col_7_8x8];
+        public static readonly ulong[] colsRight_8x8 = [col_0_right_8x8, col_1_right_8x8, col_2_right_8x8, col_3_right_8x8, col_4_right_8x8, col_5_right_8x8, col_6_right_8x8];
+
+
+
+
 
         // Deletes empty rows and columns and shifts the remaining up and left
         // Note: This removes empty rows and columns BETWEEN the board too
-        public static ulong ShiftAndRemoveEmpty(ulong bitBoard)
+        public static ulong ShiftAndRemoveEmpty(ulong bitBoard, int size)
         {
+            ulong[] rows = new ulong[size];
+            ulong[] rowsBelow = new ulong[size - 1];
+            ulong[] cols = new ulong[size];
+            ulong[] colsRight = new ulong[size - 1];
+
+            switch (size)
+            {
+                case 1:
+                    //rows = rows_1x1;
+                    //cols = cols_1x1;
+                    break;
+                case 2:
+                    break;
+                case 3:
+                    break;
+                case 4:
+                    break;
+                case 5:
+                    break;
+                case 6:
+                    rows = rows_6x6;
+                    rowsBelow = rowsBelow_6x6;
+                    cols = cols_6x6;
+                    colsRight = colsRight_6x6;
+                    break;
+                case 7:
+                    rows = rows_7x7;
+                    rowsBelow = rowsBelow_7x7;
+                    cols = cols_7x7;
+                    colsRight = colsRight_7x7;
+                    break;
+                case 8:
+                    rows = rows_8x8;
+                    rowsBelow = rowsBelow_8x8;
+                    cols = cols_8x8;
+                    colsRight = colsRight_8x8;
+                    break;
+
+                default:
+                    break;
+            }
+
             for (int i = 0; i < rows.Length; i++)
             {
                 while ((bitBoard & rows[i]) == 0 && (bitBoard & rowsBelow[i]) != 0)
@@ -205,7 +535,7 @@ namespace Tile_Slayer
                 }
             }
 
-            for (int i = 0; i < cols.Length; i++)
+            for (int i = 0; i < cols.Length - 1; i++)
             {
                 while ((bitBoard & cols[i]) == 0 && (bitBoard & colsRight[i]) != 0)
                 {
@@ -216,12 +546,13 @@ namespace Tile_Slayer
             return bitBoard;
         }
 
-        
+
         // Deletes empty rows and columns and shifts the remaining up and to the left
-        // Note: This only shifts the bitboard to the top left corner
+        // Note: This only shifts the bitboard to the top left corner.
+        // Note: It doesn't remove interior rows/cols like ShiftAndRemoveEmpty does
         public static ulong ShiftUpAndLeft(ulong bitBoard)
         {
-            while((bitBoard & 0x1010101010101ff) == 0)
+            while ((bitBoard & 0x1010101010101ff) == 0)
             {
                 bitBoard = (bitBoard & 0xffffffffffffff00) >> 9;
             }
@@ -245,102 +576,87 @@ namespace Tile_Slayer
         /// <param name="bitBoard">The bitBoard to canonicalize</param>
         /// <param name="verboseLogging">If true, output inforamtion about the process to the console for debugging purposes</param>
         /// <returns>Returns the min hash from the puzzle</returns>
-        public static ulong CanonicalizeBitboard(ulong bitBoard, bool verboseLogging = false)
+        public static ulong CanonicalizeBitboard(ulong bitBoard)
         {
-            //// This is only temporary
-            //return bitBoard;
-            
-            ulong original = bitBoard;
-            HashSet<ulong> transformations =
-            [
-                ShiftUpAndLeft(bitBoard)
-            ];
+            ulong minValue = ShiftUpAndLeft(bitBoard);
+            ulong current;
 
+            // Rotation 90
             bitBoard = Rotate90CCFast_8x8(bitBoard);
-            transformations.Add(ShiftUpAndLeft(bitBoard));
+            current = ShiftUpAndLeft(bitBoard);
+            minValue = Math.Min(minValue, current);
 
+            // Rotation 180
             bitBoard = Rotate90CCFast_8x8(bitBoard);
-            transformations.Add(ShiftUpAndLeft(bitBoard));
+            current = ShiftUpAndLeft(bitBoard);
+            minValue = Math.Min(minValue, current);
 
+            // Rotation 270
             bitBoard = Rotate90CCFast_8x8(bitBoard);
-            transformations.Add(ShiftUpAndLeft(bitBoard));
+            current = ShiftUpAndLeft(bitBoard);
+            minValue = Math.Min(minValue, current);
 
+            // Flip and do all rotations again
             bitBoard = FlipHorizontally(bitBoard);
-            transformations.Add(ShiftUpAndLeft(bitBoard));
+            current = ShiftUpAndLeft(bitBoard);
+            minValue = Math.Min(minValue, current);
 
             bitBoard = Rotate90CCFast_8x8(bitBoard);
-            transformations.Add(ShiftUpAndLeft(bitBoard));
+            current = ShiftUpAndLeft(bitBoard);
+            minValue = Math.Min(minValue, current);
 
             bitBoard = Rotate90CCFast_8x8(bitBoard);
-            transformations.Add(ShiftUpAndLeft(bitBoard));
+            current = ShiftUpAndLeft(bitBoard);
+            minValue = Math.Min(minValue, current);
 
             bitBoard = Rotate90CCFast_8x8(bitBoard);
-            transformations.Add(ShiftUpAndLeft(bitBoard));
+            current = ShiftUpAndLeft(bitBoard);
+            minValue = Math.Min(minValue, current);
 
-            ulong minHash = ulong.MaxValue;
-            foreach (ulong data in transformations)
-            {
-                minHash = Math.Min(minHash, data);
-            }
-
-            if (verboseLogging == true)
-            {
-                if (minHash != original)
-                {
-                    Console.WriteLine($"This puzzle wasn't in it's Canonical form.");
-                    Console.WriteLine($"Original:");
-                    PrintBitboard(original);
-
-                    Console.WriteLine();
-                    Console.WriteLine($"Canonical form found:");
-                    PrintBitboard(minHash);
-                    Console.WriteLine();
-                }
-                else
-                {
-                    Console.WriteLine("This puzzle was already in its canonical form.");
-                }
-            }
-            return minHash;
+            return minValue;
         }
 
 
-
-        public static ulong CanonicalizeBitboard2(ulong bitBoard, bool verboseLogging = false)
+        public static ulong CanonicalizeBitboard2(ulong bitBoard)
         {
-            HashSet<ulong> transformations =
-            [
-                ShiftUpAndLeft(bitBoard)
-            ];
+            ulong minValue = ShiftUpAndLeft(bitBoard);
+            ulong current;
 
+            // Rotation 90
             bitBoard = Rotate90CCFast_8x8(bitBoard);
-            transformations.Add(ShiftUpAndLeft(bitBoard));
+            current = ShiftUpAndLeft(bitBoard);
+            // x = minValue
+            // y = current
+            minValue = Math.Min(minValue, current);
 
+            // Rotation 180
             bitBoard = Rotate90CCFast_8x8(bitBoard);
-            transformations.Add(ShiftUpAndLeft(bitBoard));
+            current = ShiftUpAndLeft(bitBoard);
+            minValue = Math.Min(minValue, current);
 
+            // Rotation 270
             bitBoard = Rotate90CCFast_8x8(bitBoard);
-            transformations.Add(ShiftUpAndLeft(bitBoard));
+            current = ShiftUpAndLeft(bitBoard);
+            minValue = Math.Min(minValue, current);
 
+            // Flip and do all rotations again
             bitBoard = FlipHorizontally(bitBoard);
-            transformations.Add(ShiftUpAndLeft(bitBoard));
+            current = ShiftUpAndLeft(bitBoard);
+            minValue = Math.Min(minValue, current);
 
             bitBoard = Rotate90CCFast_8x8(bitBoard);
-            transformations.Add(ShiftUpAndLeft(bitBoard));
+            current = ShiftUpAndLeft(bitBoard);
+            minValue = Math.Min(minValue, current);
 
             bitBoard = Rotate90CCFast_8x8(bitBoard);
-            transformations.Add(ShiftUpAndLeft(bitBoard));
+            current = ShiftUpAndLeft(bitBoard);
+            minValue = Math.Min(minValue, current);
 
             bitBoard = Rotate90CCFast_8x8(bitBoard);
-            transformations.Add(ShiftUpAndLeft(bitBoard));
+            current = ShiftUpAndLeft(bitBoard);
+            minValue = Math.Min(minValue, current);
 
-            ulong minHash = ulong.MaxValue;
-            foreach (ulong data in transformations)
-            {
-                minHash = Math.Min(minHash, data);
-            }
-
-            return minHash;
+            return minValue;
         }
 
         public static void TimeAction(Action action, ulong iterations)
@@ -416,9 +732,9 @@ namespace Tile_Slayer
         /// 
         public static bool CompareCanonical(HashSet<ulong> setA, HashSet<ulong> setB)
         {
-            foreach(ulong a in setA)
+            foreach (ulong a in setA)
             {
-                if(setB.Contains(a)) return true;
+                if (setB.Contains(a)) return true;
             }
             throw new NotImplementedException();
         }
@@ -427,7 +743,7 @@ namespace Tile_Slayer
         {
             HashSet<ulong> result = new HashSet<ulong>();
 
-            foreach(ulong a in set)
+            foreach (ulong a in set)
             {
                 result.Add(CanonicalizeBitboard(a));
             }
@@ -449,34 +765,196 @@ namespace Tile_Slayer
         }
 
         /// <summary>
-        /// Finds the x, y pairs of all the bits in a ulong
+        /// For each bit in a ulong, finds the x, y index of where the bit is on a 8x8 bitboard
         /// </summary>
-        /// <param name="ul"></param>
-        /// <returns></returns>
-        public static List<(int x, int y)> GetValues(ulong ul)
+        /// <param name="bitboard">The bitboard to search</param>
+        /// <returns>A List containing (int x, int y) pairs for each bit in the bitboard.</returns>
+        public static (HashSet<int> x, HashSet<int> y) FindXYofIndices(ulong bitboard)
         {
+            // Example input
+            // 2097152
+            // 0 0 0 0 0 1 0 0
+            // 0 0 0 0 0 1 0 0
+            // 0 0 0 0 0 1 0 0
+            // 0 0 0 0 0 0 0 0
+            // 0 0 0 0 0 0 0 0
+            // 0 0 0 0 0 0 0 0
+            // 0 0 0 0 0 0 0 0
+            // 0 0 0 0 0 0 0 0
 
-            int index;
-            int accumativeIndex = 0;
-            List<(int x, int y)> result = new List<(int x, int y)>();
+            // Example output
+            // x = {0, 1, 2}
+            // y = {5}
 
-            while(ul > 0)
+            HashSet<int> x = new HashSet<int>();
+            HashSet<int> y = new HashSet<int>();
+
+            while (bitboard != 0)
             {
-                index = BitOperations.TrailingZeroCount(ul);
-                accumativeIndex += index;
-                result.Add((accumativeIndex % 8, accumativeIndex / 8));
-                ul >>= index + 1;
-                accumativeIndex++;
+                // Find index of least significant 1-bit
+                int index = BitOperations.TrailingZeroCount(bitboard);
+
+                // Calculate x and y coordinates
+                x.Add(index % 8);         // x is the column (0-7)
+                y.Add(index / 8);         // y is the row (0-7)
+
+                // Clear the least significant 1-bit
+                bitboard &= (bitboard - 1);
             }
-            return result;
+
+            return (x, y);
         }
 
-        public static ulong GetNext(ulong bitboard, ulong mask)
+
+
+
+        ///// <summary>
+        ///// 
+        ///// </summary>
+        ///// <param name="n">Size</param>
+        //public static HashSet<ulong> GetStartingPositions(int n)
+        //{
+        //    HashSet<ulong> results = new HashSet<ulong>();
+
+        //    for (int col = 0; col < n; col++)
+        //    {
+        //        for (int row = 0; row < n; row++)
+        //        {
+        //            results.Add(SetBitboardCell(0UL, row, col, true));
+        //        }
+        //    }
+
+        //    return results;
+        //}
+
+        /// <summary>
+        /// A collection is a set of all possible values from the points in startingPositions
+        /// 
+        /// </summary>
+        /// <param name="startingPositions"></param>
+        /// <returns>The collection</returns>
+        /// <exception cref="NotImplementedException"></exception>
+        public static HashSet<ulong> GetCollection(ulong startingPositions)
         {
-            Bmi2.
-            ulong t = bitboard | (bitboard - 1);
-            return (t + 1) | ((~(long)t & -~(long)t) - 1) >> (BSF(bitboard) + 1);
+            // Need to create the masks from startingPositions
+
+            throw new NotImplementedException();
         }
+
+
+
+        /// <summary>
+        /// This takes in a mask and returns a HashSet of all the ulongs you could make from the masked bits
+        /// </summary>
+        /// <param name="mask"></param>
+        public static HashSet<ulong> GetPermutations(ulong mask, ulong vertex)
+        {
+            HashSet<ulong> permutations = new HashSet<ulong>();
+
+            for (ulong i = 1; i < Math.Pow(2, BitOperations.PopCount(mask)); i++)
+            {
+                permutations.Add(Bmi2.X64.ParallelBitDeposit(i, mask) | vertex);
+            }
+
+            return permutations;
+        }
+
+
+        // These are used to mask out the GetPermutations method
+        private static ulong[] boardMask = new ulong[8] { 0x1, 0x303, 0x70707, 0xf0f0f0f, 0x1f1f1f1f1f, 0x3f3f3f3f3f3f, 0x7f7f7f7f7f7f7f, 0xffffffffffffffff };
+
+        /// <summary>
+        /// Given a bitboard, returns a mask of the where the rows and columns intersect
+        /// It shouldn't include the input
+        /// It should factor in the puzzle size
+        /// </summary>
+        /// <param name="bitboard"></param>
+        /// <returns></returns>
+        public static ulong GetMask(ulong bitboard, int size)
+        {
+            // Example input and size = 7
+            // 87960930238976
+            // 0 0 0 0 0 0 0 0
+            // 0 1 0 0 0 0 1 0
+            // 0 0 0 0 0 0 0 0
+            // 0 0 0 0 0 0 0 0
+            // 0 0 0 0 0 0 0 0
+            // 0 0 0 0 1 0 1 0
+            // 0 0 0 0 0 0 0 0
+            // 0 0 0 0 0 0 0 0
+
+            // Example output
+            // 0 1 0 0 1 0 1 0
+            // 1 0 1 1 1 1 0 0
+            // 0 1 0 0 1 0 1 0
+            // 0 1 0 0 1 0 1 0
+            // 0 1 0 0 1 0 1 0
+            // 1 0 1 1 1 1 0 0
+            // 0 1 0 0 1 0 1 0
+            // 0 0 0 0 0 0 0 0
+
+            (HashSet<int> x, HashSet<int> y) pairs = new();
+            pairs = FindXYofIndices(bitboard);
+
+            ulong mask = 0UL;
+            ulong[] rows = new ulong[size];
+            ulong[] cols = new ulong[size];
+            switch (size)
+            {
+                case 1:
+                    rows = rows_1x1;
+                    cols = cols_1x1;
+                    break;
+                case 2:
+                    rows = rows_2x2;
+                    cols = cols_2x2;
+                    break;
+                case 3:
+                    rows = rows_3x3;
+                    cols = cols_3x3;
+                    break;
+                case 4:
+                    rows = rows_4x4;
+                    cols = cols_4x4;
+                    break;
+                case 5:
+                    rows = rows_5x5;
+                    cols = cols_5x5;
+                    break;
+                case 6:
+                    rows = rows_6x6;
+                    cols = cols_6x6;
+                    break;
+                case 7:
+                    rows = rows_7x7;
+                    cols = cols_7x7;
+                    break;
+                case 8:
+                    rows = rows_8x8;
+                    cols = cols_8x8;
+                    break;
+                default:
+                    break;
+            }
+            foreach (var x in pairs.x)
+            {
+                mask |= cols[x];
+            }
+
+            foreach (var y in pairs.y)
+            {
+                mask |= rows[y];
+            }
+
+            return (mask ^ bitboard) & boardMask[size];
+        }
+
+        //public static ulong GetNext(ulong bitboard, ulong mask)
+        //{
+        //    Bmi2.
+        //    ulong t = bitboard | (bitboard - 1);
+        //    return (t + 1) | ((~(long)t & -~(long)t) - 1) >> (BSF(bitboard) + 1);
+        //}
 
     }
 }

@@ -21,59 +21,26 @@ namespace Tile_Slayer
     {
         public static void Main(string[] args)
         {
-            //for (ulong i = 0; i < 100; i++)
+            HashSet<ulong> output = new HashSet<ulong>();
+            DFS dfs = new DFS(5);
+            output = dfs.RookSearch2();
+
+            //foreach (ulong value in output)
             //{
-            //    Console.WriteLine(BitOperations.PopCount(i));
-            //}
-            int n = 5;
-            DFS dfs = new DFS(n);
-
-            HashSet<ulong> parent = new HashSet<ulong>();
-            HashSet<ulong> grandparent = new HashSet<ulong>();
-
-            for (int i = 0; i < n; i++)
-            {
-                for (int j = 0; j < n; j++)
-                {
-                    parent.UnionWith(dfs.RookSearch(0UL, i, j));
-
-                }
-            }
-
-            //ulong startingBoard = 2385729457UL;
-
-            // Print all the children in parents
-            //foreach(var child in parent)
-            //{
-            //    PrintBitboard(child);
-            //    Thread.Sleep(50);
+            //    PrintBitboard(value);
             //}
 
-            //grandparent.UnionWith(parent);
-            for (int i = 0; i < n; i++)
-            {
-                foreach (ulong child in parent)
-                {
-                    grandparent.Add(child);
-                    var xy_pairs = GetValues(child);
+            Console.WriteLine($"{output.Count}");
+            
+            //PrintBitboard(GetMask(0x1100000011, 5));
 
-                    foreach (var pair in xy_pairs)
-                    {
-                        grandparent.UnionWith(ReduceToCanonical(dfs.RookSearch(child, pair.x, pair.y)));
-                    }
-                }
-                parent.UnionWith(ReduceToCanonical(grandparent));
+            Console.WriteLine();
 
-            }
 
-            //totalCanonical = ReduceToCanonical(parent).Count;
+            //Puzzle puzzle = new Puzzle();
+            //puzzle.SetPuzzleData(578721382720276488UL);
+            //PrintBitboard(puzzle.GetPuzzleData());
 
-            //Console.WriteLine($"Total: {total}");
-            //Console.WriteLine($"Canonical: {ReduceToCanonical(parent).Count}");
-
-            grandparent = ReduceToCanonical(grandparent);
-            Console.WriteLine(grandparent.Max<ulong>());
-            Console.WriteLine(grandparent.Count);
         }
 
         #region Next lexigraphical bit

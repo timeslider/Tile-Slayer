@@ -27,13 +27,11 @@ namespace Tile_Slayer
         public HashSet<ulong> RookSearch(ulong inital, int startX, int startY)
         {
             Stack<ulong> possible = new Stack<ulong>();
-            HashSet<ulong> found = new HashSet<ulong>();
-            HashSet<ulong> Marked = new HashSet<ulong>();
+            HashSet<ulong> visited = new HashSet<ulong>();
 
             ulong start = SetBitboardCell(inital, startX, startY, true);
             possible.Push(start);
-            found.Add(start);
-            Marked.Add(start);
+            visited.Add(start);
 
             // Generate directions for the specific row and column
             var directions = new List<(int dx, int dy)>();
@@ -60,15 +58,14 @@ namespace Tile_Slayer
                     int newY = startY + dy;
 
                     ulong nextVertex = SetBitboardCell(vertex, newX, newY, true);
-                    if (!Marked.Contains(nextVertex))
+                    if (!visited.Contains(nextVertex))
                     {
                         possible.Push(nextVertex);
-                        found.Add(nextVertex);
-                        Marked.Add(nextVertex);
+                        visited.Add(nextVertex);
                     }
                 }
             }
-            return found;
+            return visited;
         }
 
         /// <summary>
@@ -79,48 +76,38 @@ namespace Tile_Slayer
         /// <param name="startX"></param>
         /// <param name="startY"></param>
         /// <returns></returns>
-        public HashSet<ulong> RookSearch2(ulong inital, int startX, int startY)
+        public HashSet<ulong> RookSearch2()
         {
             Stack<ulong> possible = new Stack<ulong>();
-            HashSet<ulong> marked = new HashSet<ulong>();
+            HashSet<ulong> visited = new HashSet<ulong>();
 
-            ulong start = SetBitboardCell(inital, startX, startY, true);
-            possible.Push(start);
-            marked.Add(start);
-
-            // Generate directions for the specific row and column
-            var directions = new List<(int dx, int dy)>();
-            // Add horizontal moves in startY row
-            for (int d = 1; d <= 7; d++)
+            // Start will everything. If doing canonical, can probably be simplified
+            for(int i = 0; i < N; i++)
             {
-                if (startX + d < N) directions.Add((d, 0));   // right
-                if (startX - d >= 0) directions.Add((-d, 0)); // left
-            }
-            // Add vertical moves in startX column
-            for (int d = 1; d <= 7; d++)
-            {
-                if (startY + d < N) directions.Add((0, d));   // down
-                if (startY - d >= 0) directions.Add((0, -d)); // up
+                for (int j = 0; j < N; j++)
+                {
+                    possible.Push(SetBitboardCell(0UL, i, j, true));
+                    visited.Add(SetBitboardCell(0UL, i, j, true));
+                }
             }
 
             while (possible.Count > 0)
             {
                 ulong vertex = possible.Pop();
 
-                foreach (var (dx, dy) in directions)
+                foreach (var x in GetPermutations(GetMask(vertex, N), vertex))
                 {
-                    int newX = startX + dx;
-                    int newY = startY + dy;
-
-                    ulong nextVertex = SetBitboardCell(vertex, newX, newY, true);
-                    if (!marked.Contains(nextVertex))
+                    
+                    if (!visited.Contains(x))
                     {
-                        possible.Push(nextVertex);
-                        marked.Add(nextVertex);
+                        possible.Push(x);
+                        visited.Add(x);
                     }
                 }
             }
-            return marked;
+            return visited;
         }
+
+
     }
 }
