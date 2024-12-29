@@ -21,51 +21,21 @@ namespace Tile_Slayer
     {
         public static void Main(string[] args)
         {
-            HashSet<ulong> output = new HashSet<ulong>();
-            DFS dfs = new DFS(5);
-            output = dfs.RookSearch2();
-
-            //foreach (ulong value in output)
-            //{
-            //    PrintBitboard(value);
-            //}
-
-            Console.WriteLine($"{output.Count}");
-            
-            //PrintBitboard(GetMask(0x1100000011, 5));
-
-            Console.WriteLine();
 
 
-            //Puzzle puzzle = new Puzzle();
-            //puzzle.SetPuzzleData(578721382720276488UL);
-            //PrintBitboard(puzzle.GetPuzzleData());
 
+            //HashSet<ulong> output = new HashSet<ulong>();
+            //DFS dfs = new DFS(4);
+            //output = dfs.RookSearch2();
+
+            ////foreach (ulong value in output)
+            ////{
+            ////    PrintBitboard(value);
+            ////}
+
+            //Console.WriteLine(output.Count);
         }
 
-        #region Next lexigraphical bit
-        //        int i = 15;
-        //        int count = 10;
-        //        count += i;
-        //            int v = 15;
-        //        int w = 15;
-        //        int t = 0;
-        //            while(true)
-        //            {
-        //                t = (v | (v - 1)) + 1;
-        //                w = t | ((((t & -t) / (v & -v)) >> 1) - 1);
-        //                Console.WriteLine(Convert.ToString(w, 2).PadLeft(32, '0') + "  <--");
-        //                v = w;
-        //                i++;
-        //            }
 
-
-        //}
-
-        //public int BSF(int x)
-        //{
-        //    return 0;
-        //}
-        #endregion
     }
 }

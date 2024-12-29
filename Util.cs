@@ -16,10 +16,7 @@ namespace Tile_Slayer
 {
     internal static class Util
     {
-        static Util()
-        {
 
-        }
         // Sets a new bit in a bitboard
         public static ulong SetBitboardCell(ulong bitBoard, int x, int y, bool value)
         {
@@ -847,21 +844,25 @@ namespace Tile_Slayer
         /// This takes in a mask and returns a HashSet of all the ulongs you could make from the masked bits
         /// </summary>
         /// <param name="mask"></param>
-        public static HashSet<ulong> GetPermutations(ulong mask, ulong vertex)
+        public static HashSet<ulong> GetPermutations(ulong mask, ulong vertex, HashSet<ulong> visited)
         {
             HashSet<ulong> permutations = new HashSet<ulong>();
-
+            ulong temp;
             for (ulong i = 1; i < Math.Pow(2, BitOperations.PopCount(mask)); i++)
             {
-                permutations.Add(Bmi2.X64.ParallelBitDeposit(i, mask) | vertex);
+                temp = Bmi2.X64.ParallelBitDeposit(i, mask) | vertex;
+                if(visited.Contains(temp) == false)
+                {
+                    permutations.Add(temp);
+                }
             }
 
-            return permutations;
+            return ReduceToCanonical(permutations);
         }
 
 
         // These are used to mask out the GetPermutations method
-        private static ulong[] boardMask = new ulong[8] { 0x1, 0x303, 0x70707, 0xf0f0f0f, 0x1f1f1f1f1f, 0x3f3f3f3f3f3f, 0x7f7f7f7f7f7f7f, 0xffffffffffffffff };
+        private static ulong[] boardMask = new ulong[8] { 0x1, 0x303, 0x70707, 0xf0f0f0f, 0x1f1f1f1f1f, 0x3f3f3f3f3f3f, 0x7f7f7f7f7f7f7f, 0xffffffffffffffff};
 
         /// <summary>
         /// Given a bitboard, returns a mask of the where the rows and columns intersect
@@ -955,6 +956,29 @@ namespace Tile_Slayer
         //    ulong t = bitboard | (bitboard - 1);
         //    return (t + 1) | ((~(long)t & -~(long)t) - 1) >> (BSF(bitboard) + 1);
         //}
+        #region Next lexigraphical bit
+        //        int i = 15;
+        //        int count = 10;
+        //        count += i;
+        //            int v = 15;
+        //        int w = 15;
+        //        int t = 0;
+        //            while(true)
+        //            {
+        //                t = (v | (v - 1)) + 1;
+        //                w = t | ((((t & -t) / (v & -v)) >> 1) - 1);
+        //                Console.WriteLine(Convert.ToString(w, 2).PadLeft(32, '0') + "  <--");
+        //                v = w;
+        //                i++;
+        //            }
 
+
+        //}
+
+        //public int BSF(int x)
+        //{
+        //    return 0;
+        //}
+        #endregion
     }
 }

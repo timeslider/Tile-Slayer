@@ -91,11 +91,14 @@ namespace Tile_Slayer
                 }
             }
 
+            visited = ReduceToCanonical(visited);
+
+            float total = 0;
             while (possible.Count > 0)
             {
                 ulong vertex = possible.Pop();
 
-                foreach (var x in GetPermutations(GetMask(vertex, N), vertex))
+                foreach (var x in GetPermutations(GetMask(vertex, N), vertex, visited))
                 {
                     
                     if (!visited.Contains(x))
@@ -104,6 +107,9 @@ namespace Tile_Slayer
                         visited.Add(x);
                     }
                 }
+
+                Console.WriteLine($"{++total / Math.Pow(2, N * N)}\t{(float)possible.Count / ((float)N * (float)N)}");
+                
             }
             return visited;
         }
