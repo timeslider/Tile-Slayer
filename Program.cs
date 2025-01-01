@@ -23,6 +23,18 @@ namespace Tile_Slayer
         {
 
 
+            Bitboard bitboard = new Bitboard(0UL, 5, 7);
+            bitboard.SetBitboardCell(2, 1);
+
+            Console.WriteLine(bitboard.bitboardValue);
+
+            bitboard.PrintBitboard();
+
+            //bitboard.
+
+
+            //bitboard.SetBitboardCell(0, 3, true);
+
 
             //HashSet<ulong> output = new HashSet<ulong>();
             //DFS dfs = new DFS(4);
