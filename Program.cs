@@ -22,14 +22,20 @@ namespace Tile_Slayer
         public static void Main(string[] args)
         {
 
+            ulong board = 524UL;
 
-            Bitboard bitboard = new Bitboard(532610UL, 5, 5);
+            Bitboard bitboard = new Bitboard(board, 6, 6);
+
+            bitboard.PrintBitboard();
+
+            bitboard.SetState();
+            bitboard.PrintStateSplit();
+
+            bitboard.GetNewState(Direction.Down);
+            bitboard.PrintStateSplit();
 
             bitboard.PrintBitboard();
 
-            bitboard.Rotate90CCSquare();
-
-            bitboard.PrintBitboard();
 
             //bitboard.
 

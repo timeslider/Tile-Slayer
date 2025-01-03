@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Runtime.Intrinsics.X86;
@@ -24,8 +25,13 @@ namespace Tile_Slayer
         private readonly int sizeY;
         public int SizeY { get { return sizeY; } }
         
-        private bool IsSquare = false;
+        private bool isSquare = false;
 
+        private int red = 0;
+        private int yellow = 0;
+        private int blue = 0;
+        private int state = 0;
+        public int State { get { return state; } set { SetState(); } }
 
 
         public Bitboard(ulong bitboard, int sizeX)
@@ -47,8 +53,9 @@ namespace Tile_Slayer
             this.sizeY = sizeY;
             if(this.SizeX == this.SizeY)
             {
-                this.IsSquare = true;
+                this.isSquare = true;
             }
+            GetInitialState();
         }
 
 
@@ -74,6 +81,12 @@ namespace Tile_Slayer
             return (bitboardValue & (1UL << bitPosition)) != 0;
         }
 
+        // Needs testing
+        public bool GetBitboardCell(int index)
+        {
+            return (bitboardValue & (1UL << index)) != 0;
+        }
+
         public void PrintBitboard(bool invert = false)
         {
             StringBuilder sb = new StringBuilder();
@@ -85,9 +98,27 @@ namespace Tile_Slayer
             {
                 for (int col = 0; col < SizeX; col++)
                 {
+                    if(row * sizeX + col == red)
+                    {
+                        sb.Append("R ");
+                        continue;
+                    }
+                    if (row * sizeX + col == yellow)
+                    {
+                        sb.Append("Y ");
+                        continue;
+                    }
+
+                    if(row * sizeX + col == blue)
+                    {
+                        sb.Append("B ");
+                        continue;
+                    }
+
                     if (invert == true)
                     {
                         sb.Append(GetBitboardCell(col, row) ? "- " : "1 ");
+                        
                     }
                     else
                     {
@@ -134,6 +165,224 @@ namespace Tile_Slayer
             bitboardValue = result;
         }
 
+
+        public void GetInitialState()
+        {
+            //int i = 0;
+            //for (int row = 0; row < sizeY && i == 0; row++)
+            //{
+            //    for (int col = 0; col < sizeX && i == 0; col++)
+            //    {
+            //        if(GetBitboardCell(col, row) == false && i == 0)
+            //        {
+            //            Red = (ulong)(Math.Pow(2,row * sizeX + col));
+            //            i++;
+            //        }
+            //    }
+            //}
+            //(int x, int y) RedIndicees = Util.FindXYofIndices(Red);
+            //GetBitboardCell(Red << 1);
+
+
+            // Find red's index
+            for (int i = 0; i < 64; i++)
+            {
+                if(GetBitboardCell(i) == false)
+                {
+                    red = i;
+                    break;
+                }
+            }
+
+            // The following logic can probably be simplifed using a BFS/DFS
+
+            List<int> next = new List<int>();
+            // Find the next empty cell that is either to the right or below Red 
+            if(GetBitboardCell(red + 1) == false) // checks right
+            {
+                next.Add(red + 1);
+                if (GetBitboardCell(next[0] + 1) == false) // Checks right again
+                {
+                    next.Add(next[0] + 1);
+                }
+                else
+                {
+                    if(GetBitboardCell(red + sizeX) == false) // Try going back to red and looking under it first
+                    {
+                        next.Add(red + sizeX);
+                    }
+                    else
+                    {
+                        next.Add(next[0] + sizeX); // Add down
+                    }
+                }
+            }
+            else
+            {
+                next.Add(red + sizeX); // Adds down
+                // Check Left
+                if(GetBitboardCell(next[0] - 1) == false)
+                {
+                    next.Add(next[0] - 1);
+                }
+                // Check right
+                else if(GetBitboardCell(next[0] + 1) == false)
+                {
+                    next.Add(next[0] + 1);
+                }
+                // Add down
+                else
+                {
+                    next.Add(next[0] + sizeX);
+                }
+            }
+
+            yellow = Math.Min(next[0], next[1]);
+            blue = Math.Max(next[0], next[1]);
+        }
+
+        public void PrintStateSplit()
+        {
+            for(int i = 0; i < 3; i++)
+            {
+                int temp = (state >> (i * 6)) & 63;
+                switch (i)
+                {
+                    case 0:
+                        Console.WriteLine($"Red: {temp}");
+                        break;
+                    case 1:
+                        Console.WriteLine($"Yellow: {temp}");
+                        break;
+                    case 2:
+                        Console.WriteLine($"Blue: {temp}");
+                        break;
+                    default:
+                        break;
+                }
+            }
+        }
+
+        public void PrintState()
+        {
+            Console.WriteLine(state);
+        }
+
+
+        public void SetState()
+        {
+            state = red | (yellow << 6) | (blue << 12);
+        }
+
+        public void SetState(int red, int yellow, int blue)
+        {
+            this.red = red;
+            this.yellow = yellow;
+            this.blue = blue;
+        }
+
+        public void GetNewState(Direction direction)
+        {
+            //ulong tiles = (ulong)Math.Pow(2, state & 0x3f) + (ulong)Math.Pow(2, state >> 6 & 0x3f) + (ulong)Math.Pow(2, state >> 12 & 0x3f);
+            List<(ulong color, ulong comp, string c)> tiles = new List<(ulong color, ulong comp, string c)> ();
+            
+            // Add color red and it's comp green
+            tiles.Add(((ulong)Math.Pow(2, state & 0x3f), (ulong)Math.Pow(2, state >> 6 & 0x3f) + (ulong)Math.Pow(2, state >> 12 & 0x3f), "R"));
+            // Add color yellow and it's comp purple
+            tiles.Add(((ulong)Math.Pow(2, state >> 6 & 0x3f), (ulong)Math.Pow(2, state & 0x3f) + (ulong)Math.Pow(2, state >> 12 & 0x3f), "Y"));
+            // Add color blue and it's comp orange
+            tiles.Add(((ulong)Math.Pow(2, state >> 12 & 0x3f), (ulong)Math.Pow(2, state & 0x3f) + (ulong)Math.Pow(2, state >> 6 & 0x3f), "B"));
+            // Sort: If we know the order, then it becomes very easy to check if tiles overly with other tiles or not
+            
+            
+            (ulong color, ulong comp, string c) temp = tiles[0];
+            if (tiles[0].color > tiles[1].color)
+            {
+                tiles[0] = tiles[1];
+                tiles[1] = temp;
+            }
+            if (tiles[1].color > tiles[2].color)
+            {
+                temp = tiles[1];
+                tiles[1] = tiles[2];
+                tiles[2] = temp;
+                if (tiles[0].color > tiles[1].color)
+                {
+                    temp = tiles[0];
+                    tiles[0] = tiles[1];
+                    tiles[1] = temp;
+                }
+            }
+
+            if (direction == Direction.Up)
+            {
+                for (int i = 0; i < tiles.Count; i++)
+                {
+                    if ((tiles[i].color >> SizeX | bitboardValue) != bitboardValue && (tiles[i].color >> sizeX | tiles[i].comp) != tiles[i].comp)
+                    {
+                        tiles[i] = (tiles[i].color >> sizeX, tiles[i].comp, tiles[i].c);
+                    }
+                }
+            }
+
+            if (direction == Direction.Left)
+            {
+                for (int i = 0; i < tiles.Count; i++)
+                {
+                    if ((tiles[i].color >> 1 | bitboardValue) != bitboardValue && (tiles[i].color >> 1 | tiles[i].comp) != tiles[i].comp)
+                    {
+                        tiles[i] = (tiles[i].color >> 1, tiles[i].comp, tiles[i].c);
+                    }
+                }
+            }
+
+            if (direction == Direction.Down)
+            {
+                for (int i = tiles.Count - 1; i >= 0 ; i--)
+                {
+                    if ((tiles[i].color << SizeX | bitboardValue) != bitboardValue && (tiles[i].color << sizeX | tiles[i].comp) != tiles[i].comp)
+                    {
+                        tiles[i] = (tiles[i].color << sizeX, tiles[i].comp, tiles[i].c);
+                    }
+                }
+            }
+
+            if (direction == Direction.Right)
+            {
+                for (int i = tiles.Count - 1; i >= 0; i--)
+                {
+                    if ((tiles[i].color << 1 | bitboardValue) != bitboardValue && (tiles[i].color << 1 | tiles[i].comp) != tiles[i].comp)
+                    {
+                        tiles[i] = (tiles[i].color << 1, tiles[i].comp, tiles[i].c);
+                    }
+                }
+            }
+
+            // Convert tiles back into a state
+            int newState = 0;
+            foreach (var tile in tiles)
+            {
+                switch (tile.c)
+                {
+                    case "R":
+                        this.red = (int)Math.Log2(tile.color);
+                        break;
+                    case "Y":
+                        this.yellow = ((int)Math.Log2(tile.color) & 0x3f) << 6;
+                        break;
+                    case "B":
+                        this.blue = ((int)Math.Log2(tile.color) & 0x3f) << 6;
+                        break;
+                    default:
+                        break;
+                }
+            }
+            // Return new state
+            
+        }
+
+
+        // Helper methods
         private void CheckBounds(ulong bitboard, int sizeX, int sizeY)
         {
             if (sizeX < 1)

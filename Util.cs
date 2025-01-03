@@ -41,11 +41,30 @@ namespace Tile_Slayer
             }
         }
 
+        /// <summary>
+        /// Gets the value of the bool at position x, y
+        /// </summary>
+        /// <param name="bitBoard">The bitboard to query.</param>
+        /// <param name="x">The 0-indexed column value.</param>
+        /// <param name="y">The 0-indexed row value.</param>
+        /// <returns></returns>
         public static bool GetBitboardCell(ulong bitBoard, int x, int y)
         {
 
             int bitPosition = x * 8 + y;
             return (bitBoard & (1UL << bitPosition)) != 0;
+        }
+
+        /// <summary>
+        /// Gets the value of the bool at index.
+        /// Index starts in the top left corner and goes left to right, top to bottom ending in the bottom right corner.
+        /// </summary>
+        /// <param name="bitboard">The bitboard to query.</param>
+        /// <param name="index">The 0-index index</param>
+        /// <returns></returns>
+        public static bool GetBitboardCell(ulong bitboard, int index)
+        {
+            return (bitboard & (1UL << index)) != 0;
         }
 
         public static void PrintBitboard(ulong bitBoard, int size = 8, bool invert = false)
