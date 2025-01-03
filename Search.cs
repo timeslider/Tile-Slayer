@@ -8,11 +8,11 @@ using static Tile_Slayer.Util;
 
 namespace Tile_Slayer
 {
-    internal class DFS
+    internal class Search
     {
         int N;
 
-        public DFS(int n)
+        public Search(int n)
         {
             N = n;
         }

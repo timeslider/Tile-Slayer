@@ -23,10 +23,11 @@ namespace Tile_Slayer
         {
 
 
-            Bitboard bitboard = new Bitboard(0UL, 5, 7);
-            bitboard.SetBitboardCell(2, 1);
+            Bitboard bitboard = new Bitboard(532610UL, 5, 5);
 
-            Console.WriteLine(bitboard.bitboardValue);
+            bitboard.PrintBitboard();
+
+            bitboard.Rotate90CCSquare();
 
             bitboard.PrintBitboard();
 
