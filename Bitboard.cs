@@ -2,10 +2,12 @@
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
+using System.Numerics;
 using System.Runtime.CompilerServices;
 using System.Runtime.Intrinsics.X86;
 using System.Text;
 using System.Threading.Tasks;
+
 
 [assembly: InternalsVisibleTo("UtilTests")]
 
@@ -16,6 +18,7 @@ namespace Tile_Slayer
     /// </summary>
     internal class Bitboard
     {
+        
         private ulong bitboardValue;
         public ulong BitboardValue { get { return bitboardValue; } }
 
@@ -283,103 +286,155 @@ namespace Tile_Slayer
 
         public void GetNewState(Direction direction)
         {
-            //ulong tiles = (ulong)Math.Pow(2, state & 0x3f) + (ulong)Math.Pow(2, state >> 6 & 0x3f) + (ulong)Math.Pow(2, state >> 12 & 0x3f);
-            List<(ulong color, ulong comp, string c)> tiles = new List<(ulong color, ulong comp, string c)> ();
-            
-            // Add color red and it's comp green
-            tiles.Add(((ulong)Math.Pow(2, state & 0x3f), (ulong)Math.Pow(2, state >> 6 & 0x3f) + (ulong)Math.Pow(2, state >> 12 & 0x3f), "R"));
-            // Add color yellow and it's comp purple
-            tiles.Add(((ulong)Math.Pow(2, state >> 6 & 0x3f), (ulong)Math.Pow(2, state & 0x3f) + (ulong)Math.Pow(2, state >> 12 & 0x3f), "Y"));
-            // Add color blue and it's comp orange
-            tiles.Add(((ulong)Math.Pow(2, state >> 12 & 0x3f), (ulong)Math.Pow(2, state & 0x3f) + (ulong)Math.Pow(2, state >> 6 & 0x3f), "B"));
-            // Sort: If we know the order, then it becomes very easy to check if tiles overly with other tiles or not
-            
-            
-            (ulong color, ulong comp, string c) temp = tiles[0];
-            if (tiles[0].color > tiles[1].color)
-            {
-                tiles[0] = tiles[1];
-                tiles[1] = temp;
-            }
-            if (tiles[1].color > tiles[2].color)
-            {
-                temp = tiles[1];
-                tiles[1] = tiles[2];
-                tiles[2] = temp;
-                if (tiles[0].color > tiles[1].color)
-                {
-                    temp = tiles[0];
-                    tiles[0] = tiles[1];
-                    tiles[1] = temp;
-                }
-            }
+            Console.WriteLine($"Red: {1UL << red}");
+            Console.WriteLine($"Yellow: {1UL << yellow}");
+            Console.WriteLine($"Blue: {1UL << blue}");
 
-            if (direction == Direction.Up)
+            ulong combine = (1UL << red) | (1UL << yellow) | (1UL << blue);
+            //Util.PrintBitboard(combine);
+            //Util.PrintBitboard((combine >> 8)); // If this is 0, then you can move all of them up, but it the bit count is less than the origial, then we destroyed bits.
+            
+            if((combine >> 8 & bitboardValue) == 0 && BitOperations.PopCount((combine >> 8)) == 3)
             {
-                for (int i = 0; i < tiles.Count; i++)
+                Console.WriteLine("All 3 tiles can be moved up.");
+            }
+            else
+            {
+                Console.WriteLine("Some bits got destroyed in the transformation or they overlaped the bitboard.");
+                if ((1UL << red) >> 8 > 0)
                 {
-                    if ((tiles[i].color >> SizeX | bitboardValue) != bitboardValue && (tiles[i].color >> sizeX | tiles[i].comp) != tiles[i].comp)
+                    Console.WriteLine("Out of bounds was not above red.");
+                    if ((((1UL << red) >> 8) | bitboardValue) != bitboardValue)
                     {
-                        tiles[i] = (tiles[i].color >> sizeX, tiles[i].comp, tiles[i].c);
+                        Console.WriteLine("Moving up would not put red in a wall.");
+                        red -= 8;
+
+                    }
+                }
+                
+                if ((1UL << yellow) >> 8 > 0)
+                {
+                    Console.WriteLine("Out of bounds was not above yellow.");
+                    if ((((1UL << yellow) >> 8) | bitboardValue) != bitboardValue)
+                    {
+                        Console.WriteLine("Moving up would not put yellow in a wall.");
+                        yellow -= 8;
+
+                    }
+                }
+                if ((1UL << blue) >> 8 > 0)
+                {
+                    Console.WriteLine("Out of bounds was not above blue.");
+                    if ((((1UL << blue) >> 8) | bitboardValue) != bitboardValue)
+                    {
+                        Console.WriteLine("Moving up would not put blue in a wall.");
+                        blue -= 8;
+
                     }
                 }
             }
 
-            if (direction == Direction.Left)
-            {
-                for (int i = 0; i < tiles.Count; i++)
-                {
-                    if ((tiles[i].color >> 1 | bitboardValue) != bitboardValue && (tiles[i].color >> 1 | tiles[i].comp) != tiles[i].comp)
-                    {
-                        tiles[i] = (tiles[i].color >> 1, tiles[i].comp, tiles[i].c);
-                    }
-                }
-            }
-
-            if (direction == Direction.Down)
-            {
-                for (int i = tiles.Count - 1; i >= 0 ; i--)
-                {
-                    if ((tiles[i].color << SizeX | bitboardValue) != bitboardValue && (tiles[i].color << sizeX | tiles[i].comp) != tiles[i].comp)
-                    {
-                        tiles[i] = (tiles[i].color << sizeX, tiles[i].comp, tiles[i].c);
-                    }
-                }
-            }
-
-            if (direction == Direction.Right)
-            {
-                for (int i = tiles.Count - 1; i >= 0; i--)
-                {
-                    if ((tiles[i].color << 1 | bitboardValue) != bitboardValue && (tiles[i].color << 1 | tiles[i].comp) != tiles[i].comp)
-                    {
-                        tiles[i] = (tiles[i].color << 1, tiles[i].comp, tiles[i].c);
-                    }
-                }
-            }
-
-            // Convert tiles back into a state
-            int newState = 0;
-            foreach (var tile in tiles)
-            {
-                switch (tile.c)
-                {
-                    case "R":
-                        this.red = (int)Math.Log2(tile.color);
-                        break;
-                    case "Y":
-                        this.yellow = ((int)Math.Log2(tile.color) & 0x3f) << 6;
-                        break;
-                    case "B":
-                        this.blue = ((int)Math.Log2(tile.color) & 0x3f) << 6;
-                        break;
-                    default:
-                        break;
-                }
-            }
-            // Return new state
-            
         }
+
+        //public void GetNewState(Direction direction)
+        //{
+        //    //ulong tiles = (ulong)Math.Pow(2, state & 0x3f) + (ulong)Math.Pow(2, state >> 6 & 0x3f) + (ulong)Math.Pow(2, state >> 12 & 0x3f);
+        //    List<(ulong color, ulong comp, string c)> tiles = new List<(ulong color, ulong comp, string c)> ();
+
+        //    // Add color red and it's comp green
+        //    tiles.Add(((ulong)Math.Pow(2, state & 0x3f), (ulong)Math.Pow(2, state >> 6 & 0x3f) + (ulong)Math.Pow(2, state >> 12 & 0x3f), "R"));
+        //    // Add color yellow and it's comp purple
+        //    tiles.Add(((ulong)Math.Pow(2, state >> 6 & 0x3f), (ulong)Math.Pow(2, state & 0x3f) + (ulong)Math.Pow(2, state >> 12 & 0x3f), "Y"));
+        //    // Add color blue and it's comp orange
+        //    tiles.Add(((ulong)Math.Pow(2, state >> 12 & 0x3f), (ulong)Math.Pow(2, state & 0x3f) + (ulong)Math.Pow(2, state >> 6 & 0x3f), "B"));
+        //    // Sort: If we know the order, then it becomes very easy to check if tiles overly with other tiles or not
+
+
+        //    (ulong color, ulong comp, string c) temp = tiles[0];
+        //    if (tiles[0].color > tiles[1].color)
+        //    {
+        //        tiles[0] = tiles[1];
+        //        tiles[1] = temp;
+        //    }
+        //    if (tiles[1].color > tiles[2].color)
+        //    {
+        //        temp = tiles[1];
+        //        tiles[1] = tiles[2];
+        //        tiles[2] = temp;
+        //        if (tiles[0].color > tiles[1].color)
+        //        {
+        //            temp = tiles[0];
+        //            tiles[0] = tiles[1];
+        //            tiles[1] = temp;
+        //        }
+        //    }
+
+        //    if (direction == Direction.Up)
+        //    {
+        //        for (int i = 0; i < tiles.Count; i++)
+        //        {
+        //            if ((tiles[i].color >> SizeX | bitboardValue) != bitboardValue && (tiles[i].color >> sizeX | tiles[i].comp) != tiles[i].comp)
+        //            {
+        //                tiles[i] = (tiles[i].color >> sizeX, tiles[i].comp, tiles[i].c);
+        //            }
+        //        }
+        //    }
+
+        //    if (direction == Direction.Left)
+        //    {
+        //        for (int i = 0; i < tiles.Count; i++)
+        //        {
+        //            if ((tiles[i].color >> 1 | bitboardValue) != bitboardValue && (tiles[i].color >> 1 | tiles[i].comp) != tiles[i].comp)
+        //            {
+        //                tiles[i] = (tiles[i].color >> 1, tiles[i].comp, tiles[i].c);
+        //            }
+        //        }
+        //    }
+
+        //    if (direction == Direction.Down)
+        //    {
+        //        for (int i = tiles.Count - 1; i >= 0 ; i--)
+        //        {
+        //            if ((tiles[i].color << SizeX | bitboardValue) != bitboardValue && (tiles[i].color << sizeX | tiles[i].comp) != tiles[i].comp)
+        //            {
+        //                tiles[i] = (tiles[i].color << sizeX, tiles[i].comp, tiles[i].c);
+        //            }
+        //        }
+        //    }
+
+        //    if (direction == Direction.Right)
+        //    {
+        //        for (int i = tiles.Count - 1; i >= 0; i--)
+        //        {
+        //            if ((tiles[i].color << 1 | bitboardValue) != bitboardValue && (tiles[i].color << 1 | tiles[i].comp) != tiles[i].comp)
+        //            {
+        //                tiles[i] = (tiles[i].color << 1, tiles[i].comp, tiles[i].c);
+        //            }
+        //        }
+        //    }
+
+        //    // Convert tiles back into a state
+        //    int newState = 0;
+        //    foreach (var tile in tiles)
+        //    {
+        //        switch (tile.c)
+        //        {
+        //            case "R":
+        //                this.red = (int)Math.Log2(tile.color);
+        //                break;
+        //            case "Y":
+        //                this.yellow = ((int)Math.Log2(tile.color) & 0x3f) << 6;
+        //                break;
+        //            case "B":
+        //                this.blue = ((int)Math.Log2(tile.color) & 0x3f) << 6;
+        //                break;
+        //            default:
+        //                break;
+        //        }
+        //    }
+        //    // Return new state
+
+        //}
 
 
         // Helper methods
